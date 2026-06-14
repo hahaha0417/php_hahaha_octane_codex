@@ -22,6 +22,12 @@ class hahaha_config_log_viewer
 
     public $Log_Directory_Path_ = '';
 
+    public $Log_Directory_Display_Input_ = '';
+
+    public $Log_Directory_Options_ = [];
+
+    public $Log_Directory_Manual_Options_ = [];
+
     public $Log_Directory_Status_ = '';
 
     public $Error_Message_ = '';
@@ -46,12 +52,16 @@ class hahaha_config_log_viewer
 
     public function Initial(string $log_directory_path = '', string $log_file = '', string $keyword = '', string $severity_filter = 'all', int $block_limit = 99): static
     {
-        $this->Page_Title_ = 'Log Viewer';
+        $this->Page_Title_ = 'Log檢視器';
         $this->Page_Subtitle_ = '用 multiple node 規則快速查看指定資料夾內的 log 檔，檔案內容由前台下載並於瀏覽器端完成行號、上色、搜尋、篩選、顯示區塊數與區塊折疊。';
         $this->Log_Directory_Default_Path_ = storage_path('logs');
         $this->Log_Directory_Allowed_Root_Path_ = $this->Log_Directory_Allowed_Root_Path_Resolve();
         $this->Log_Directory_Input_ = $log_directory_path !== '' ? $log_directory_path : $this->Log_Directory_Default_Path_;
         $this->Log_Directory_Path_ = '';
+        $this->Log_Directory_Display_Input_ = '';
+        $this->Log_Directory_Options_ = [];
+        $this->Log_Directory_Manual_Options_ = $this->Log_Directory_Manual_Options_Default_Resolve();
+        $this->Log_Directory_Input_ = $this->Log_Directory_Input_Resolve($this->Log_Directory_Input_);
         $this->Log_Directory_Status_ = '';
         $this->Error_Message_ = '';
         $this->Log_File_Options_ = [];
@@ -69,6 +79,8 @@ class hahaha_config_log_viewer
         ];
         $this->Severity_Filter_ = $this->Severity_Filter_Resolve($severity_filter);
         $this->Block_Limit_ = $this->Block_Limit_Resolve($block_limit);
+        $this->Log_Directory_Options_ = $this->Log_Directory_Options_Resolve($this->Log_Directory_Input_);
+        $this->Log_Directory_Display_Input_ = $this->Log_Directory_Display_Input_Resolve($this->Log_Directory_Input_);
 
         $this->Log_Directory_Path_ = $this->Log_Directory_Path_Resolve($this->Log_Directory_Input_);
 
@@ -82,7 +94,7 @@ class hahaha_config_log_viewer
         $this->Log_File_Options_ = $this->Log_File_Options_Resolve($this->Log_Directory_Path_);
 
         if ($this->Log_File_Options_ === []) {
-            $this->Error_Message_ = '這個資料夾目前沒有可讀取的檔案。';
+            $this->Error_Message_ = '這個資料夾目前沒有可讀取的 .log 檔案。';
 
             return $this;
         }
@@ -100,6 +112,47 @@ class hahaha_config_log_viewer
         $this->Selected_Log_File_Updated_ = (string) ($selected_log_file_option_['updated'] ?? '');
 
         return $this;
+    }
+
+    public function Log_Directory_Input_Resolve(string $log_directory_input = ''): string
+    {
+        $log_directory_input_ = trim($log_directory_input);
+        $log_directory_manual_options_ = $this->Log_Directory_Manual_Options_Default_Resolve();
+
+        if ($log_directory_input_ === '') {
+            return $log_directory_input_;
+        }
+
+        foreach ($log_directory_manual_options_ as $log_directory_option_key_ => $log_directory_option_) {
+            if (! is_string($log_directory_option_key_)) {
+                continue;
+            }
+
+            if ($log_directory_input_ === trim($log_directory_option_key_)) {
+                return (string) (realpath((string) $log_directory_option_) ?: (string) $log_directory_option_);
+            }
+        }
+
+        return $log_directory_input_;
+    }
+
+    public function Log_Directory_Display_Input_Resolve(string $log_directory_path = ''): string
+    {
+        $resolved_log_directory_path_ = $this->Path_Normalize_Resolve($log_directory_path);
+
+        if ($resolved_log_directory_path_ === '') {
+            return trim($log_directory_path);
+        }
+
+        foreach ($this->Log_Directory_Options_ as $log_directory_option_) {
+            if ($this->Path_Normalize_Resolve((string) ($log_directory_option_['path'] ?? '')) !== $resolved_log_directory_path_) {
+                continue;
+            }
+
+            return (string) ($log_directory_option_['label'] ?? $log_directory_path);
+        }
+
+        return trim($log_directory_path);
     }
 
     public function Log_Directory_Path_Resolve(string $log_directory_path = ''): string
@@ -120,7 +173,7 @@ class hahaha_config_log_viewer
             return '';
         }
 
-        if (! $this->Log_Directory_Is_Within_Allowed_Root($resolved_log_directory_path_)) {
+        if (! $this->Log_Directory_Is_Allowed_Path($resolved_log_directory_path_)) {
             return '';
         }
 
@@ -130,6 +183,20 @@ class hahaha_config_log_viewer
     public function Log_Directory_Allowed_Root_Path_Resolve(): string
     {
         return dirname(base_path());
+    }
+
+    /**
+     * @return array<int|string, string>
+     */
+    public function Log_Directory_Manual_Options_Default_Resolve(): array
+    {
+        return [
+            'logs' => storage_path('logs'),
+            'testing' => storage_path('framework/testing/log_viewer'),
+            'hahaha' => storage_path('logs/hahaha'),
+            'hehehe' => storage_path('../../../hahaha'),
+            // dirname(base_path()).DIRECTORY_SEPARATOR.'another_project'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'logs',
+        ];
     }
 
     public function Log_Directory_Is_Within_Allowed_Root(string $log_directory_path = ''): bool
@@ -148,6 +215,32 @@ class hahaha_config_log_viewer
         return str_starts_with($resolved_log_directory_path_, $allowed_root_path_.DIRECTORY_SEPARATOR);
     }
 
+    public function Log_Directory_Is_Configured_Option_Path(string $log_directory_path = ''): bool
+    {
+        $resolved_log_directory_path_ = $this->Path_Normalize_Resolve($log_directory_path);
+
+        if ($resolved_log_directory_path_ === '') {
+            return false;
+        }
+
+        foreach ($this->Log_Directory_Manual_Options_ as $log_directory_option_) {
+            if ($this->Path_Normalize_Resolve((string) (realpath((string) $log_directory_option_) ?: (string) $log_directory_option_)) === $resolved_log_directory_path_) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function Log_Directory_Is_Allowed_Path(string $log_directory_path = ''): bool
+    {
+        if ($this->Log_Directory_Is_Within_Allowed_Root($log_directory_path)) {
+            return true;
+        }
+
+        return $this->Log_Directory_Is_Configured_Option_Path($log_directory_path);
+    }
+
     public function Log_Directory_Error_Message_Resolve(string $log_directory_path = ''): string
     {
         $log_directory_path_ = trim($log_directory_path);
@@ -162,7 +255,7 @@ class hahaha_config_log_viewer
 
         $resolved_log_directory_path_ = realpath($log_directory_path_);
 
-        if ($resolved_log_directory_path_ !== false && ! $this->Log_Directory_Is_Within_Allowed_Root($resolved_log_directory_path_)) {
+        if ($resolved_log_directory_path_ !== false && ! $this->Log_Directory_Is_Allowed_Path($resolved_log_directory_path_)) {
             return '指定路徑超出允許範圍，僅可查看 base_path 上層目錄內的資料夾。';
         }
 
@@ -183,6 +276,11 @@ class hahaha_config_log_viewer
 
         foreach ($log_files_ as $log_file_) {
             $log_file_name_ = $log_file_->getFilename();
+
+            if (strtolower($log_file_->getExtension()) !== 'log') {
+                continue;
+            }
+
             $log_file_path_ = $log_file_->getRealPath() ?: $log_file_->getPathname();
             $log_file_updated_timestamp_ = $log_file_->getMTime();
 
@@ -196,6 +294,77 @@ class hahaha_config_log_viewer
         }
 
         return $log_file_options_;
+    }
+
+    /**
+     * @return array<int, array{label: string, path: string}>
+     */
+    public function Log_Directory_Options_Resolve(string $selected_log_directory_path = ''): array
+    {
+        $resolved_log_directory_options_ = [];
+        $selected_log_directory_path_ = trim($selected_log_directory_path);
+
+        foreach ($this->Log_Directory_Manual_Options_ as $log_directory_option_key_ => $log_directory_option_) {
+            $this->Log_Directory_Option_Add(
+                $resolved_log_directory_options_,
+                (string) $log_directory_option_,
+                is_string($log_directory_option_key_) ? $log_directory_option_key_ : '',
+                true
+            );
+        }
+
+        $this->Log_Directory_Option_Add($resolved_log_directory_options_, $selected_log_directory_path_);
+
+        usort($resolved_log_directory_options_, function (array $left_option_, array $right_option_): int {
+            return [$left_option_['label'], $left_option_['path']] <=> [$right_option_['label'], $right_option_['path']];
+        });
+
+        return array_values($resolved_log_directory_options_);
+    }
+
+    /**
+     * @param  array<int, array{label: string, path: string}>  $resolved_log_directory_options
+     */
+    public function Log_Directory_Option_Add(array &$resolved_log_directory_options, string $directory_path = '', string $directory_label = '', bool $allow_outside_allowed_root = false): void
+    {
+        $resolved_directory_path_ = realpath($directory_path);
+        $resolved_directory_label_ = $this->Log_Directory_Option_Label_Resolve($directory_label, $resolved_directory_path_ ?: $directory_path);
+
+        if ($resolved_directory_path_ === false || ! is_dir($resolved_directory_path_)) {
+            return;
+        }
+
+        if (! $allow_outside_allowed_root && ! $this->Log_Directory_Is_Within_Allowed_Root($resolved_directory_path_)) {
+            return;
+        }
+
+        foreach ($resolved_log_directory_options as $resolved_log_directory_option_) {
+            if (($resolved_log_directory_option_['path'] ?? '') === $resolved_directory_path_) {
+                return;
+            }
+        }
+
+        $resolved_log_directory_options[] = [
+            'label' => $resolved_directory_label_,
+            'path' => $resolved_directory_path_,
+        ];
+    }
+
+    public function Log_Directory_Option_Label_Resolve(string $directory_label = '', string $directory_path = ''): string
+    {
+        $directory_label_ = trim($directory_label);
+
+        if ($directory_label_ !== '') {
+            return $directory_label_;
+        }
+
+        $resolved_directory_name_ = basename(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, trim($directory_path)));
+
+        if ($resolved_directory_name_ !== '') {
+            return $resolved_directory_name_;
+        }
+
+        return trim($directory_path);
     }
 
     /**
@@ -262,7 +431,9 @@ class hahaha_config_log_viewer
      *     log_directory_default_path: string,
      *     log_directory_allowed_root_path: string,
      *     log_directory_input: string,
+     *     log_directory_display_input: string,
      *     log_directory_path: string,
+     *     log_directory_options: array<int, array{label: string, path: string}>,
      *     log_directory_status: string,
      *     error_message: string,
      *     log_file_options: array<int, array{key: string, name: string, size: string, updated: string, updated_timestamp: int}>,
@@ -284,7 +455,9 @@ class hahaha_config_log_viewer
             'log_directory_default_path' => $this->Log_Directory_Default_Path_,
             'log_directory_allowed_root_path' => $this->Log_Directory_Allowed_Root_Path_,
             'log_directory_input' => $this->Log_Directory_Input_,
+            'log_directory_display_input' => $this->Log_Directory_Display_Input_,
             'log_directory_path' => $this->Log_Directory_Path_,
+            'log_directory_options' => $this->Log_Directory_Options_,
             'log_directory_status' => $this->Log_Directory_Status_,
             'error_message' => $this->Error_Message_,
             'log_file_options' => $this->Log_File_Options_List_Resolve($this->Log_File_Options_),

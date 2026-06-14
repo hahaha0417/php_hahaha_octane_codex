@@ -78,10 +78,7 @@
                 margin-top: 24px;
             }
             .toolbar_path_ {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr) auto;
-                gap: 14px;
-                align-items: end;
+                display: block;
             }
             .toolbar_search_ {
                 display: grid;
@@ -107,6 +104,86 @@
                 color: var(--text-main);
                 font: inherit;
             }
+            .field_help_ {
+                margin-top: 8px;
+                color: var(--text-muted);
+                font-size: 12px;
+                line-height: 1.7;
+            }
+            .directory_input_group_ {
+                position: relative;
+            }
+            .directory_input_wrap_ {
+                position: relative;
+            }
+            .directory_input_field_ {
+                padding-right: 54px;
+            }
+            .directory_toggle_button_ {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                width: 38px;
+                height: calc(100% - 16px);
+                border: 1px solid rgba(148, 163, 184, 0.18);
+                border-radius: 12px;
+                background: rgba(30, 41, 59, 0.9);
+                color: var(--text-soft);
+                font: inherit;
+                cursor: pointer;
+            }
+            .directory_options_panel_ {
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                right: 0;
+                z-index: 30;
+                display: grid;
+                gap: 6px;
+                max-height: 240px;
+                overflow: auto;
+                padding: 10px;
+                border: 1px solid rgba(148, 163, 184, 0.18);
+                border-radius: 18px;
+                background: rgba(8, 13, 20, 0.98);
+                box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+            }
+            .directory_options_panel_[hidden] {
+                display: none;
+            }
+            .directory_option_button_ {
+                width: 100%;
+                padding: 11px 12px;
+                border: 1px solid rgba(148, 163, 184, 0.12);
+                border-radius: 12px;
+                background: rgba(15, 23, 42, 0.55);
+                color: var(--text-main);
+                font: inherit;
+                text-align: left;
+                cursor: pointer;
+            }
+            .directory_option_button_.is_active_ {
+                border-color: var(--line-strong);
+                background: rgba(245, 158, 11, 0.18);
+            }
+            .directory_option_label_ {
+                display: block;
+                font-weight: 700;
+            }
+            .directory_option_path_ {
+                display: block;
+                margin-top: 4px;
+                color: var(--text-muted);
+                font-size: 11px;
+                line-height: 1.6;
+                word-break: break-all;
+            }
+            .directory_options_empty_ {
+                padding: 10px 12px;
+                color: var(--text-muted);
+                font-size: 12px;
+                line-height: 1.7;
+            }
             .submit_button_ {
                 padding: 14px 20px;
                 border: 0;
@@ -126,6 +203,19 @@
                 font: inherit;
                 font-weight: 700;
                 cursor: pointer;
+            }
+            #search_button_,
+            #clear_button_ {
+                border: 1px solid rgba(255, 255, 255, 0.14);
+                background: #1f2937;
+                color: #f8fafc;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            }
+            #search_button_:hover,
+            #clear_button_:hover {
+                background: #374151;
+                color: #ffffff;
+                border-color: rgba(255, 255, 255, 0.22);
             }
             .viewer_stats_ {
                 margin-top: 10px;
@@ -448,28 +538,33 @@
     <body>
         <main class="page_wrap_">
             <section class="hero_panel_">
-                <div class="hero_badge_">Node Multiple Log Viewer</div>
+                <div class="hero_badge_">多節點 Log 檢視器</div>
                 <h1 class="hero_title_" id="page_title_">{{ $page_config_->Page_Title_ }}</h1>
                 <p class="hero_copy_" id="page_subtitle_">{{ $page_config_->Page_Subtitle_ }}</p>
 
                 <div class="toolbar_stack_">
                     <div class="toolbar_path_">
                         <label>
-                            <span class="field_label_">Log Directory Path</span>
-                            <input class="field_input_" id="log_directory_input_" type="text" value="{{ $page_config_->Log_Directory_Input_ }}" placeholder="例如：{{ $page_config_->Log_Directory_Default_Path_ }}">
+                            <span class="field_label_">Log目錄</span>
+                            <div class="directory_input_group_">
+                                <div class="directory_input_wrap_">
+                                    <input class="field_input_ directory_input_field_" id="log_directory_input_" type="text" value="{{ $page_config_->Log_Directory_Display_Input_ }}" placeholder="例如：{{ $page_config_->Log_Directory_Default_Path_ }}" autocomplete="off">
+                                    <button class="directory_toggle_button_" id="log_directory_toggle_" type="button">▾</button>
+                                </div>
+                                <div class="directory_options_panel_" id="log_directory_options_panel_" hidden></div>
+                            </div>
+                            <div class="field_help_">這是一個輸入選擇框；可直接輸入完整路徑，或輸入 / 選擇短名稱。</div>
                         </label>
-
-                        <button class="submit_button_" id="change_directory_button_" type="button">切換資料夾</button>
                     </div>
 
                     <div class="toolbar_search_">
                         <label>
-                            <span class="field_label_">Keyword Search</span>
-                            <input class="field_input_" id="keyword_input_" type="text" value="{{ $page_config_->Keyword_Input_ }}" placeholder="例如：exception、timeout、user id">
+                            <span class="field_label_">關鍵字搜尋</span>
+                            <input class="field_input_" id="keyword_input_" type="text" value="{{ $page_config_->Keyword_Input_ }}" placeholder="例如：例外、逾時、使用者編號">
                         </label>
 
                         <label>
-                            <span class="field_label_">Severity Filter</span>
+                            <span class="field_label_">過濾條件</span>
                             <select class="field_input_" id="severity_filter_input_">
                                 @foreach ($page_config_->Severity_Filter_Options_ as $severity_filter_key_ => $severity_filter_label_)
                                     <option value="{{ $severity_filter_key_ }}" @selected($page_config_->Severity_Filter_ === $severity_filter_key_)>{{ $severity_filter_label_ }}</option>
@@ -478,7 +573,7 @@
                         </label>
 
                         <label>
-                            <span class="field_label_">Display Blocks</span>
+                            <span class="field_label_">顯示區塊數</span>
                             <input class="field_input_" id="block_limit_input_" type="number" min="1" max="1000" step="1" value="{{ $page_config_->Block_Limit_ }}">
                         </label>
 
@@ -495,13 +590,13 @@
             <section class="layout_">
                 <aside class="panel_">
                     <div class="panel_header_">
-                        <h2 class="panel_title_">Log Files</h2>
-                        <p class="panel_subtitle_">切換資料夾或檔案時由瀏覽器下載原始 log，若檔案未更新則沿用瀏覽器快取。</p>
+                        <h2 class="panel_title_">log檔案</h2>
+                        <p class="panel_subtitle_">切換資料夾或檔案時由瀏覽器下載原始 .log，若檔案未更新則沿用瀏覽器快取。</p>
                     </div>
 
                     <div class="file_search_wrap_">
                         <label>
-                            <span class="field_label_">File Search</span>
+                            <span class="field_label_">檔案搜尋</span>
                             <input class="field_input_" id="file_search_input_" type="text" placeholder="搜尋檔名，例如：laravel、queue、2026">
                         </label>
                     </div>
@@ -521,10 +616,10 @@
                         <div>
                             <h2 class="viewer_title_" id="viewer_title_">{{ $page_config_->Selected_Log_File_Label_ !== '' ? $page_config_->Selected_Log_File_Label_ : '尚未選擇檔案' }}</h2>
                             <p class="viewer_meta_" id="viewer_meta_">
-                                size: {{ $page_config_->Selected_Log_File_Size_ !== '' ? $page_config_->Selected_Log_File_Size_ : 'n/a' }}<br>
-                                updated: {{ $page_config_->Selected_Log_File_Updated_ !== '' ? $page_config_->Selected_Log_File_Updated_ : 'n/a' }}
+                                大小：{{ $page_config_->Selected_Log_File_Size_ !== '' ? $page_config_->Selected_Log_File_Size_ : '無' }}<br>
+                                更新時間：{{ $page_config_->Selected_Log_File_Updated_ !== '' ? $page_config_->Selected_Log_File_Updated_ : '無' }}
                             </p>
-                            <div class="viewer_stats_" id="viewer_stats_">visible: 0 / total: 0 lines</div>
+                            <div class="viewer_stats_" id="viewer_stats_">目前顯示區塊：0 / 總行數：0</div>
                         </div>
 
                         <div class="viewer_actions_">
@@ -556,7 +651,7 @@
                     </div>
 
                     <div class="pagination_row_bottom_">
-                        <span class="pagination_label_" id="pagination_label_">page 0 / 0</span>
+                        <span class="pagination_label_" id="pagination_label_">第 0 頁 / 共 0 頁</span>
                         <button class="pagination_button_" id="page_first_button_" type="button">最前</button>
                         <button class="pagination_button_" id="page_previous_button_" type="button">上一頁</button>
                         <div class="pagination_pages_" id="pagination_pages_"></div>
@@ -566,7 +661,7 @@
                 </article>
             </section>
 
-            <div class="footer_">route: `page.demo.log_viewer` / shortcuts: `q` 最前、`w` 上頁、`e` 下頁、`r` 最後</div>
+            <div class="footer_">路由：`page.demo.log_viewer` / 快捷鍵：`q` 最前、`w` 上頁、`e` 下頁、`r` 最後</div>
         </main>
 
         <script id="log_viewer_bootstrap_" type="application/json">
@@ -588,10 +683,11 @@
                 var contentCacheName = 'page_demo_log_viewer_content_v1';
                 var elements = {
                     logDirectoryInput: document.getElementById('log_directory_input_'),
+                    logDirectoryToggle: document.getElementById('log_directory_toggle_'),
+                    logDirectoryOptionsPanel: document.getElementById('log_directory_options_panel_'),
                     keywordInput: document.getElementById('keyword_input_'),
                     severityFilterInput: document.getElementById('severity_filter_input_'),
                     blockLimitInput: document.getElementById('block_limit_input_'),
-                    changeDirectoryButton: document.getElementById('change_directory_button_'),
                     searchButton: document.getElementById('search_button_'),
                     clearButton: document.getElementById('clear_button_'),
                     fileSearchInput: document.getElementById('file_search_input_'),
@@ -618,8 +714,10 @@
                 };
                 var state = {
                     directoryInput: initialState.log_directory_input || '',
+                    directoryDisplayInput: initialState.log_directory_display_input || '',
                     directoryPath: initialState.log_directory_path || '',
                     allowedRootPath: initialState.log_directory_allowed_root_path || '',
+                    directoryOptions: initialState.log_directory_options || [],
                     directoryStatus: initialState.log_directory_status || '',
                     errorMessage: initialState.error_message || '',
                     files: initialState.log_file_options || [],
@@ -746,6 +844,130 @@
                     return null;
                 }
 
+                function resolveDirectoryDisplayInput(directoryPath) {
+                    var normalizedDirectoryPath = normalizePath(directoryPath);
+                    var index = 0;
+                    var directoryOption = null;
+
+                    for (index = 0; index < state.directoryOptions.length; index++) {
+                        directoryOption = state.directoryOptions[index] || {};
+
+                        if (normalizePath(directoryOption.path || '') === normalizedDirectoryPath) {
+                            return String(directoryOption.label || directoryPath || '');
+                        }
+                    }
+
+                    return String(directoryPath || '');
+                }
+
+                function resolveDirectoryPathFromInput(directoryInput) {
+                    var trimmedDirectoryInput = String(directoryInput || '').trim();
+                    var index = 0;
+                    var directoryOption = null;
+
+                    if (trimmedDirectoryInput === '') {
+                        return '';
+                    }
+
+                    for (index = 0; index < state.directoryOptions.length; index++) {
+                        directoryOption = state.directoryOptions[index] || {};
+
+                        if (trimmedDirectoryInput === String(directoryOption.label || '')) {
+                            return String(directoryOption.path || '');
+                        }
+                    }
+
+                    return trimmedDirectoryInput;
+                }
+
+                function resolveDirectoryOptionFromInput(directoryInput) {
+                    var trimmedDirectoryInput = String(directoryInput || '').trim();
+                    var index = 0;
+                    var directoryOption = null;
+
+                    if (trimmedDirectoryInput === '') {
+                        return null;
+                    }
+
+                    for (index = 0; index < state.directoryOptions.length; index++) {
+                        directoryOption = state.directoryOptions[index] || {};
+
+                        if (
+                            trimmedDirectoryInput === String(directoryOption.label || '')
+                            || normalizePath(trimmedDirectoryInput) === normalizePath(String(directoryOption.path || ''))
+                        ) {
+                            return directoryOption;
+                        }
+                    }
+
+                    return null;
+                }
+
+                function renderDirectoryOptions() {
+                    var html = '';
+                    var index = 0;
+                    var directoryOption = null;
+                    var isActive = false;
+
+                    for (index = 0; index < state.directoryOptions.length; index++) {
+                        directoryOption = state.directoryOptions[index] || {};
+
+                        isActive = normalizePath(String(directoryOption.path || '')) === normalizePath(state.directoryInput);
+
+                        html += '<button class="directory_option_button_' + (isActive ? ' is_active_' : '') + '" type="button" data-log-directory-path="' + escapeHtml(String(directoryOption.path || '')) + '" data-log-directory-label="' + escapeHtml(String(directoryOption.label || '')) + '">'
+                            + '<span class="directory_option_label_">' + escapeHtml(String(directoryOption.label || '')) + '</span>'
+                            + '<span class="directory_option_path_">' + escapeHtml(String(directoryOption.path || '')) + '</span>'
+                            + '</button>';
+                    }
+
+                    if (html === '') {
+                        html = '<div class="directory_options_empty_">找不到符合的候選路徑。</div>';
+                    }
+
+                    elements.logDirectoryOptionsPanel.innerHTML = html;
+                    bindDirectoryOptionButtons();
+                }
+
+                function bindDirectoryOptionButtons() {
+                    var optionButtons = elements.logDirectoryOptionsPanel.querySelectorAll('[data-log-directory-path]');
+                    var index = 0;
+
+                    for (index = 0; index < optionButtons.length; index++) {
+                        optionButtons[index].addEventListener('mousedown', function (event) {
+                            event.preventDefault();
+                        });
+
+                        optionButtons[index].addEventListener('click', function () {
+                            var directoryPath = this.getAttribute('data-log-directory-path') || '';
+                            var directoryLabel = this.getAttribute('data-log-directory-label') || '';
+
+                            state.directoryDisplayInput = directoryLabel;
+                            elements.logDirectoryInput.value = directoryLabel;
+                            closeDirectoryOptions();
+                            loadDirectory(directoryPath, '');
+                        });
+                    }
+                }
+
+                function openDirectoryOptions() {
+                    renderDirectoryOptions();
+                    elements.logDirectoryOptionsPanel.hidden = false;
+                }
+
+                function closeDirectoryOptions() {
+                    elements.logDirectoryOptionsPanel.hidden = true;
+                }
+
+                function toggleDirectoryOptions() {
+                    if (elements.logDirectoryOptionsPanel.hidden) {
+                        openDirectoryOptions();
+
+                        return;
+                    }
+
+                    closeDirectoryOptions();
+                }
+
                 function resolveContentCacheKey() {
                     var selectedLogFile = resolveSelectedFile();
                     var url = null;
@@ -785,6 +1007,26 @@
                     return requestedDirectoryPath.indexOf(allowedRootPath + '\\') === 0;
                 }
 
+                function isConfiguredDirectoryOption(directoryPath) {
+                    var requestedDirectoryPath = normalizePath(directoryPath);
+                    var index = 0;
+                    var directoryOption = null;
+
+                    if (requestedDirectoryPath === '') {
+                        return false;
+                    }
+
+                    for (index = 0; index < state.directoryOptions.length; index++) {
+                        directoryOption = state.directoryOptions[index] || {};
+
+                        if (normalizePath(String(directoryOption.path || '')) === requestedDirectoryPath) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
                 function validateDirectoryInput(requestedDirectory) {
                     var trimmedDirectory = String(requestedDirectory || '').trim();
                     var message = '';
@@ -794,6 +1036,10 @@
                     }
 
                     if (isDirectoryWithinAllowedRoot(trimmedDirectory)) {
+                        return true;
+                    }
+
+                    if (isConfiguredDirectoryOption(trimmedDirectory)) {
                         return true;
                     }
 
@@ -1280,7 +1526,7 @@
                     state.currentPage = resolvedPageNumber;
                     persistCurrentPageNumber();
                     elements.reverseBlocksInput.checked = state.reverseBlocks;
-                    elements.paginationLabel.textContent = 'page ' + resolvedPageNumber + ' / ' + totalPages + '  lines ' + visibleLinesOnPage;
+                    elements.paginationLabel.textContent = '第 ' + resolvedPageNumber + ' 頁 / 共 ' + totalPages + ' 頁 / 本頁 ' + visibleLinesOnPage + ' 行';
                     elements.paginationTotalLabel.textContent = '總頁數 ' + totalPages;
                     elements.pageJumpInput.max = totalPages > 0 ? String(totalPages) : '1';
                     elements.pageJumpInput.value = resolvedPageNumber > 0 ? String(resolvedPageNumber) : '';
@@ -1434,14 +1680,14 @@
                     var selectedLogFile = resolveSelectedFile();
 
                     state.selectedLogFileLabel = selectedLogFile ? selectedLogFile.name : '尚未選擇檔案';
-                    state.selectedLogFileSize = selectedLogFile ? selectedLogFile.size : 'n/a';
-                    state.selectedLogFileUpdated = selectedLogFile ? selectedLogFile.updated : 'n/a';
+                    state.selectedLogFileSize = selectedLogFile ? selectedLogFile.size : '無';
+                    state.selectedLogFileUpdated = selectedLogFile ? selectedLogFile.updated : '無';
                     state.selectedLogFileUpdatedTimestamp = selectedLogFile ? (selectedLogFile.updated_timestamp || 0) : 0;
                 }
 
                 function renderViewerMeta() {
                     elements.viewerTitle.textContent = state.selectedLogFileLabel || '尚未選擇檔案';
-                    elements.viewerMeta.innerHTML = 'size: ' + escapeHtml(state.selectedLogFileSize || 'n/a') + '<br>updated: ' + escapeHtml(state.selectedLogFileUpdated || 'n/a');
+                    elements.viewerMeta.innerHTML = '大小：' + escapeHtml(state.selectedLogFileSize || '無') + '<br>更新時間：' + escapeHtml(state.selectedLogFileUpdated || '無');
                 }
 
                 function renderRows() {
@@ -1466,7 +1712,7 @@
                     }
 
                     renderPagination(paginatedBlocks.length, visibleLinesOnPage);
-                    elements.viewerStats.textContent = 'visible blocks: ' + visibleBlocksOnPage + ' / page lines: ' + visibleLinesOnPage + ' / filtered lines: ' + filteredLinesCount + ' / total lines: ' + state.rawLogLines.length;
+                    elements.viewerStats.textContent = '顯示區塊：' + visibleBlocksOnPage + ' / 本頁行數：' + visibleLinesOnPage + ' / 篩選後行數：' + filteredLinesCount + ' / 總行數：' + state.rawLogLines.length;
 
                     if (state.isLoading) {
                         elements.logGrid.hidden = true;
@@ -1505,7 +1751,7 @@
                                 + (currentPageBlocks[index].summary.tone === 'trace' ? 'is_trace_ ' : '')
                                 + '">'
                                 + '<td class="log_line_number_">' + currentPageBlocks[index].summary.line_number + '</td>'
-                                + '<td class="log_line_text_"><details class="log_details_" data-block-key="' + escapeHtml(blockStateKey) + '"' + (shouldOpenBlock ? ' open' : '') + '><summary class="log_summary_" title="雙擊展開或收合"><span class="log_summary_text_">' + escapeHtml(currentPageBlocks[index].summary.text) + '</span><span class="log_block_meta_">' + currentPageBlocks[index].lines.length + ' lines<span class="log_block_hint_">double click</span></span></summary><div class="log_block_body_">';
+                                + '<td class="log_line_text_"><details class="log_details_" data-block-key="' + escapeHtml(blockStateKey) + '"' + (shouldOpenBlock ? ' open' : '') + '><summary class="log_summary_" title="雙擊展開或收合"><span class="log_summary_text_">' + escapeHtml(currentPageBlocks[index].summary.text) + '</span><span class="log_block_meta_">' + currentPageBlocks[index].lines.length + ' 行<span class="log_block_hint_">雙擊展開</span></span></summary><div class="log_block_body_">';
 
                             for (var lineIndex = 1; lineIndex < currentPageBlocks[index].lines.length; lineIndex++) {
                                 html += '<div class="log_block_line_"><span class="log_block_line_number_">' + currentPageBlocks[index].lines[lineIndex].line_number + '</span><span class="log_block_line_text_">' + escapeHtml(currentPageBlocks[index].lines[lineIndex].text) + '</span></div>';
@@ -1534,7 +1780,8 @@
 
                 function renderAll() {
                     setStatus(state.errorMessage !== '' ? state.errorMessage : state.directoryStatus, state.errorMessage !== '');
-                    elements.logDirectoryInput.value = state.directoryInput;
+                    renderDirectoryOptions();
+                    elements.logDirectoryInput.value = state.directoryDisplayInput;
                     elements.keywordInput.value = state.keywordInput;
                     elements.fileSearchInput.value = state.fileSearchInput;
                     elements.severityFilterInput.value = state.severityFilter;
@@ -1547,12 +1794,14 @@
 
                 function loadDirectory(requestedDirectory, requestedLogFile) {
                     var url = new URL(endpoints.files, window.location.origin);
+                    var resolvedRequestedDirectory = resolveDirectoryPathFromInput(requestedDirectory);
 
-                    if (! validateDirectoryInput(requestedDirectory)) {
+                    if (! validateDirectoryInput(resolvedRequestedDirectory)) {
                         return;
                     }
 
-                    state.directoryInput = String(requestedDirectory || '').trim();
+                    state.directoryInput = String(resolvedRequestedDirectory || '').trim();
+                    state.directoryDisplayInput = String(requestedDirectory || '').trim();
                     state.errorMessage = '';
                     setStatus('前台更新資料夾與檔案清單中...', false);
                     updateHistory();
@@ -1576,6 +1825,8 @@
                         return response.json();
                     }).then(function (payload) {
                         state.directoryInput = payload.log_directory_input || state.directoryInput;
+                        state.directoryDisplayInput = payload.log_directory_display_input || resolveDirectoryDisplayInput(state.directoryInput);
+                        state.directoryOptions = payload.log_directory_options || state.directoryOptions || [];
                         state.directoryPath = payload.log_directory_path || '';
                         state.directoryStatus = payload.log_directory_status || '';
                         state.errorMessage = payload.error_message || '';
@@ -1713,15 +1964,59 @@
                     return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
                 }
 
-                elements.logDirectoryInput.value = state.directoryInput;
+                elements.logDirectoryInput.value = state.directoryDisplayInput;
+                renderDirectoryOptions();
                 elements.keywordInput.value = state.keywordInput;
                 elements.fileSearchInput.value = state.fileSearchInput;
                 elements.severityFilterInput.value = state.severityFilter;
-                    elements.blockLimitInput.value = state.blockLimit;
+                elements.blockLimitInput.value = state.blockLimit;
                 elements.reverseBlocksInput.checked = state.reverseBlocks;
 
-                elements.changeDirectoryButton.addEventListener('click', function () {
-                    loadDirectory(elements.logDirectoryInput.value, '');
+                elements.logDirectoryToggle.addEventListener('click', function () {
+                    toggleDirectoryOptions();
+                });
+
+                elements.logDirectoryInput.addEventListener('focus', function () {
+                    openDirectoryOptions();
+                });
+
+                elements.logDirectoryInput.addEventListener('input', function () {
+                    state.directoryDisplayInput = this.value || '';
+                    openDirectoryOptions();
+                });
+
+                elements.logDirectoryInput.addEventListener('change', function () {
+                    var matchedDirectoryOption = resolveDirectoryOptionFromInput(this.value);
+
+                    state.directoryDisplayInput = this.value || '';
+
+                    if (! matchedDirectoryOption) {
+                        return;
+                    }
+
+                    loadDirectory(String(matchedDirectoryOption.path || this.value || ''), '');
+                });
+
+                elements.logDirectoryInput.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        closeDirectoryOptions();
+
+                        return;
+                    }
+
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        closeDirectoryOptions();
+                        loadDirectory(elements.logDirectoryInput.value, '');
+                    }
+                });
+
+                document.addEventListener('click', function (event) {
+                    if (elements.logDirectoryInput.contains(event.target) || elements.logDirectoryToggle.contains(event.target) || elements.logDirectoryOptionsPanel.contains(event.target)) {
+                        return;
+                    }
+
+                    closeDirectoryOptions();
                 });
 
                 elements.searchButton.addEventListener('click', function () {
@@ -1811,13 +2106,6 @@
                     if (event.key === 'Enter') {
                         event.preventDefault();
                         runSearch();
-                    }
-                });
-
-                elements.logDirectoryInput.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        loadDirectory(elements.logDirectoryInput.value, '');
                     }
                 });
 

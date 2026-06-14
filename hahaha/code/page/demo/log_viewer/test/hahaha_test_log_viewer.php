@@ -42,11 +42,23 @@ class hahaha_test_log_viewer extends TestCase
         ]));
 
         $response_->assertStatus(200);
-        $response_->assertSee('Log Viewer');
-        $response_->assertSee('切換資料夾');
+        $response_->assertSee('Log檢視器');
+        $response_->assertDontSee('change_directory_button_');
+        $response_->assertSee('log_directory_options_panel_');
+        $response_->assertSee('這是一個輸入選擇框');
+        $response_->assertSee('logs');
+        $response_->assertSee('testing');
+        $response_->assertSee('hahaha');
+        $response_->assertSee('hehehe');
+        $response_->assertSee((string) realpath(storage_path('logs')));
         $response_->assertSee('搜尋');
         $response_->assertSee('清除');
-        $response_->assertSee('File Search');
+        $response_->assertSee('Log目錄');
+        $response_->assertSee('關鍵字搜尋');
+        $response_->assertSee('過濾條件');
+        $response_->assertSee('顯示區塊數');
+        $response_->assertSee('log檔案');
+        $response_->assertSee('檔案搜尋');
         $response_->assertSee('只看 Json');
         $response_->assertSee('只看非laravel log');
         $response_->assertSee('前台載入中');
@@ -77,6 +89,18 @@ class hahaha_test_log_viewer extends TestCase
         $response_->assertJsonPath('log_directory_allowed_root_path', dirname(base_path()));
         $response_->assertJsonPath('selected_log_file', 'queue-test.log');
         $response_->assertJsonPath('block_limit', 99);
+        $response_->assertJsonFragment([
+            'label' => 'testing',
+            'path' => realpath(storage_path('framework/testing/log_viewer')) ?: storage_path('framework/testing/log_viewer'),
+        ]);
+        $response_->assertJsonFragment([
+            'label' => 'logs',
+            'path' => realpath(storage_path('logs')) ?: storage_path('logs'),
+        ]);
+        $response_->assertJsonFragment([
+            'label' => 'hahaha',
+            'path' => realpath(storage_path('logs/hahaha')) ?: storage_path('logs/hahaha'),
+        ]);
         $response_->assertJsonPath('log_file_options.0.key', 'queue-test.log');
         $response_->assertJsonPath('log_file_options.1.key', 'laravel-test.log');
     }
