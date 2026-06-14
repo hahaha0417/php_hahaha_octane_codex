@@ -22,9 +22,9 @@ class hahaha_controller_log_viewer extends Controller
         $frontend_bootstrap_ = json_encode([
             'state' => $page_config_->Frontend_State_Resolve(),
             'endpoints' => [
-                'page' => route('page.demo.log_viewer'),
-                'files' => route('page.demo.log_viewer.files'),
-                'content' => route('page.demo.log_viewer.content'),
+                'page' => route('tool.page.log_viewer'),
+                'files' => route('tool.page.log_viewer.files'),
+                'content' => route('tool.page.log_viewer.content'),
             ],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
