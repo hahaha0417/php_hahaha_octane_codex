@@ -1,0 +1,58 @@
+讀取AGENTS.md
+http://127.0.0.1:10001/page/demo/log-viewer?log_directory=C%3A%5Cweb%5Cweb%5Chahaha_octane_codex%5Chahaha%5Cstorage%5Clogs
+要有行數和上色加上「關鍵字搜尋」或「只看 error / warning 篩選
+沒有搜尋按鈕
+路徑和切換資料夾在上面一行
+載入和切換檔案將檔案下載(如果沒更新用瀏覽器快取檔案，純前台處理)
+所有操作都在前台處理
+檔案沒更新，直接使用快取，不重新下載
+可以指定顯示行數(預設999行)
+有laravel除錯區塊或json要可以折疊
+雙擊才展開
+切換檔案要記住摺疊狀態(下次切換要一樣的折疊狀態)
+幫我加分頁，預設最下面一頁，可以反向顯示(區塊為單位)
+要有頁數可以點，並可以指定頁數
+新增 全部折疊，全部展開 按鈕
+分頁移到最下面，跳頁在上面
+上面要標示總頁數
+切換分頁也要記錄狀態
+log files可以搜尋
+切換檔案分頁狀態也要記錄
+display lines 換成display blocks(預設99)
+Severity Filter 新增只看json
+Severity Filter 新增只看非laravel log
+log path 預設只能看到bash_path上層目錄，超出跳對話框(Swal套件)
+新增快捷鍵
+q(最前) w(上頁) e下頁 r(最後)
+快捷鍵說明寫在下方備註
+log路徑改可多選和可輸入(一個可選擇輸入框)，可以選擇路徑
+給我一個array可以指定選項(路徑) 沒有看見選項
+
+-----------------------------------------------------
+
+讀取AGENTS.md
+http://127.0.0.1:10001/page/demo/log-viewer?log_directory=C%3A%5Cweb%5Cweb%5Chahaha_octane_codex%5Chahaha%5Cstorage%5Clogs&log_file=browser.log&page=1
+不能選路徑
+路徑是一個輸入選擇框(輸入路徑或顯示選項)
+候選路徑顯示短名稱而不是完整路徑
+設定選項要可以載入
+hehehe沒顯示
+移除 切換資料夾 按鈕
+搜尋和清除 換亮黑色按鈕(素色) hover要換顏色(亮黑色，亮一點)
+
+-----------------------------------------------------
+
+讀取AGENTS.md
+http://127.0.0.1:10001/page/demo/log-viewer?log_directory=C%3A%5Cweb%5Cweb%5Chahaha_octane_codex%5Chahaha%5Cstorage%5Clogs&log_file=browser.log&page=1
+hahaha\code\page\demo\log_viewer
+移到
+hahaha\tool\page\log_viewer
+namespace改成hahaha\tool\page\log_viewer
+
+tool資料夾走classmap
+相關路由設定幫我打包成單例使用(放入資料夾)
+
+-----------------------------------------------------
+
+
+

@@ -1,6 +1,6 @@
 <?php
 
-namespace hahaha\page\demo\node;
+namespace hahaha\tool\page\log_viewer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +18,7 @@ class hahaha_controller_log_viewer extends Controller
         $keyword_ = trim((string) $request->query('keyword', ''));
         $severity_filter_ = trim((string) $request->query('severity_filter', 'all'));
         $block_limit_ = (int) $request->query('block_limit', 99);
-        $page_config_ = hahaha_config_log_viewer::Instance()->Clear()->Initial($log_directory_path_, $log_file_, $keyword_, $severity_filter_, $block_limit_);
+        $page_config_ = hahaha_config_log_viewer_base::Instance()->Clear()->Initial($log_directory_path_, $log_file_, $keyword_, $severity_filter_, $block_limit_);
         $frontend_bootstrap_ = json_encode([
             'state' => $page_config_->Frontend_State_Resolve(),
             'endpoints' => [
@@ -28,7 +28,7 @@ class hahaha_controller_log_viewer extends Controller
             ],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        return View::file(base_path('code/page/demo/log_viewer/view/hahaha_view_log_viewer.blade.php'), [
+        return View::file(base_path('tool/page/log_viewer/view/hahaha_view_log_viewer.blade.php'), [
             'page_config_' => $page_config_,
             'frontend_bootstrap_' => $frontend_bootstrap_,
         ]);
@@ -41,7 +41,7 @@ class hahaha_controller_log_viewer extends Controller
         $keyword_ = trim((string) $request->query('keyword', ''));
         $severity_filter_ = trim((string) $request->query('severity_filter', 'all'));
         $block_limit_ = (int) $request->query('block_limit', 99);
-        $page_config_ = hahaha_config_log_viewer::Instance()->Clear()->Initial($log_directory_path_, $log_file_, $keyword_, $severity_filter_, $block_limit_);
+        $page_config_ = hahaha_config_log_viewer_base::Instance()->Clear()->Initial($log_directory_path_, $log_file_, $keyword_, $severity_filter_, $block_limit_);
 
         return response()->json($page_config_->Frontend_State_Resolve());
     }
@@ -50,7 +50,7 @@ class hahaha_controller_log_viewer extends Controller
     {
         $log_directory_path_ = trim((string) $request->query('log_directory', ''));
         $log_file_ = trim((string) $request->query('log_file', ''));
-        $page_config_ = hahaha_config_log_viewer::Instance()->Clear()->Initial($log_directory_path_, $log_file_);
+        $page_config_ = hahaha_config_log_viewer_base::Instance()->Clear()->Initial($log_directory_path_, $log_file_);
 
         if ($page_config_->Log_Directory_Path_ === '') {
             return response('找不到指定的 log 資料夾。', 404, [

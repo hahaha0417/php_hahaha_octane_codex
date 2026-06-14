@@ -1,6 +1,6 @@
 <?php
 
-namespace hahaha\page\demo\node;
+namespace hahaha\tool\page\log_viewer;
 
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;

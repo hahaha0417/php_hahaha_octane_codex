@@ -41,6 +41,7 @@
         "classmap": [
             "library/hahahalib",
             "code",
+            "tool",
             "template"
         ]
     },

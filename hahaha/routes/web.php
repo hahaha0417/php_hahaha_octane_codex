@@ -14,3 +14,4 @@ Route::get('/backend/animal', [hahaha_backend_animal_controller::class, 'Index']
 
 require __DIR__.'/web/page.php';
 require __DIR__.'/web/template.php';
+require __DIR__.'/web/tool.php';

@@ -1,60 +1,20 @@
 <?php
 
-namespace hahaha\page\demo\node;
+namespace hahaha\tool\page\log_viewer;
 
 use hahaha\hahaha_instance_clear;
 use Illuminate\Support\Facades\File;
 use SplFileInfo;
 
-class hahaha_config_log_viewer
+class hahaha_config_log_viewer_base extends hahaha_config_log_viewer
 {
     use hahaha_instance_clear;
 
-    public $Page_Title_ = '';
-
-    public $Page_Subtitle_ = '';
-
-    public $Log_Directory_Default_Path_ = '';
-
-    public $Log_Directory_Allowed_Root_Path_ = '';
-
-    public $Log_Directory_Input_ = '';
-
-    public $Log_Directory_Path_ = '';
-
-    public $Log_Directory_Display_Input_ = '';
-
-    public $Log_Directory_Options_ = [];
-
-    public $Log_Directory_Manual_Options_ = [];
-
-    public $Log_Directory_Status_ = '';
-
-    public $Error_Message_ = '';
-
-    public $Log_File_Options_ = [];
-
-    public $Selected_Log_File_ = '';
-
-    public $Selected_Log_File_Label_ = '';
-
-    public $Selected_Log_File_Size_ = '';
-
-    public $Selected_Log_File_Updated_ = '';
-
-    public $Keyword_Input_ = '';
-
-    public $Severity_Filter_ = 'all';
-
-    public $Severity_Filter_Options_ = [];
-
-    public $Block_Limit_ = 99;
-
     public function Initial(string $log_directory_path = '', string $log_file = '', string $keyword = '', string $severity_filter = 'all', int $block_limit = 99): static
     {
-        $this->Page_Title_ = 'Log檢視器';
-        $this->Page_Subtitle_ = '用 multiple node 規則快速查看指定資料夾內的 log 檔，檔案內容由前台下載並於瀏覽器端完成行號、上色、搜尋、篩選、顯示區塊數與區塊折疊。';
-        $this->Log_Directory_Default_Path_ = storage_path('logs');
+        $this->Page_Title_ = $this->Page_Title_Default_Resolve();
+        $this->Page_Subtitle_ = $this->Page_Subtitle_Default_Resolve();
+        $this->Log_Directory_Default_Path_ = $this->Log_Directory_Default_Path_Resolve();
         $this->Log_Directory_Allowed_Root_Path_ = $this->Log_Directory_Allowed_Root_Path_Resolve();
         $this->Log_Directory_Input_ = $log_directory_path !== '' ? $log_directory_path : $this->Log_Directory_Default_Path_;
         $this->Log_Directory_Path_ = '';
@@ -70,18 +30,11 @@ class hahaha_config_log_viewer
         $this->Selected_Log_File_Size_ = '';
         $this->Selected_Log_File_Updated_ = '';
         $this->Keyword_Input_ = trim($keyword);
-        $this->Severity_Filter_Options_ = [
-            'all' => '全部',
-            'error' => '只看 Error',
-            'warning' => '只看 Warning',
-            'json' => '只看 Json',
-            'non_laravel' => '只看非laravel log',
-        ];
+        $this->Severity_Filter_Options_ = $this->Severity_Filter_Options_Default_Resolve();
         $this->Severity_Filter_ = $this->Severity_Filter_Resolve($severity_filter);
         $this->Block_Limit_ = $this->Block_Limit_Resolve($block_limit);
         $this->Log_Directory_Options_ = $this->Log_Directory_Options_Resolve($this->Log_Directory_Input_);
         $this->Log_Directory_Display_Input_ = $this->Log_Directory_Display_Input_Resolve($this->Log_Directory_Input_);
-
         $this->Log_Directory_Path_ = $this->Log_Directory_Path_Resolve($this->Log_Directory_Input_);
 
         if ($this->Log_Directory_Path_ === '') {
@@ -178,25 +131,6 @@ class hahaha_config_log_viewer
         }
 
         return $resolved_log_directory_path_;
-    }
-
-    public function Log_Directory_Allowed_Root_Path_Resolve(): string
-    {
-        return dirname(base_path());
-    }
-
-    /**
-     * @return array<int|string, string>
-     */
-    public function Log_Directory_Manual_Options_Default_Resolve(): array
-    {
-        return [
-            'logs' => storage_path('logs'),
-            'testing' => storage_path('framework/testing/log_viewer'),
-            'hahaha' => storage_path('logs/hahaha'),
-            'hehehe' => storage_path('../../../hahaha'),
-            // dirname(base_path()).DIRECTORY_SEPARATOR.'another_project'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'logs',
-        ];
     }
 
     public function Log_Directory_Is_Within_Allowed_Root(string $log_directory_path = ''): bool
@@ -418,7 +352,7 @@ class hahaha_config_log_viewer
     public function Block_Limit_Resolve(int $block_limit = 99): int
     {
         if ($block_limit <= 0) {
-            return 99;
+            return $this->Block_Limit_Default_Resolve();
         }
 
         return min($block_limit, 1000);
