@@ -1,4 +1,10 @@
 讀取AGENTS.md
+用 multiple node 規則做 log_viewer
+要可設定log資料夾(指定路徑)
+
+-----------------------------------------------------
+
+讀取AGENTS.md
 http://127.0.0.1:10001/page/demo/log-viewer?log_directory=C%3A%5Cweb%5Cweb%5Chahaha_octane_codex%5Chahaha%5Cstorage%5Clogs
 要有行數和上色加上「關鍵字搜尋」或「只看 error / warning 篩選
 沒有搜尋按鈕
