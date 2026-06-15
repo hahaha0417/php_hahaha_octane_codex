@@ -1,0 +1,60 @@
+讀取AGENTS.md
+用 multiple node 規則做  queue_viewer
+要可選擇connection、db
+
+
+-----------------------------------------------------
+讀取AGENTS.md
+用 multiple node 規則做  queue_viewer
+要可選擇connection、db
+hahaha\template\page\node\queue_viewer
+移到
+hahaha\tool\page\queue_viewer
+namespace hahaha\tool\page\queue_viewer;
+黑色背景
+分tab頁 設定 資訊 queue fail_queue
+queue 可以 新增 修改 刪除 多選 分頁
+要可以選queue
+http://127.0.0.1:10001/tool/page/queue/viewer?tab=queue&connection=database&db=mariadb&queue=
+選queue在這頁
+編輯queue job 移除
+新增queue job 移除
+選queue改下拉式選單，可以輸入選擇queue
+選queue 寬最大
+queue jobs寬最大
+不要套用queue 輸入(enter)或選擇queue完更新
+
+-----------------------------------------------------
+讀取AGENTS.md
+http://127.0.0.1:10001/tool/page/queue/viewer?tab=queue&connection=database&db=mariadb&queue=default&queue_page=1
+
+指定頁數在右方，要跳頁按鈕
+刪除多選 和指定頁數同一行
+指定頁數前要顯示總頁數
+指定頁數最右方
+所有黃色按鈕都幫我換成灰色(素色)
+刪除按鈕 沒功能
+下方輸入頁數移除
+切換頁數不可使用不要隱藏改disabled
+移除 套用queue 按鈕
+移除 全部queue 按鈕
+
+選擇queue是輸入多選框(可以多選+輸入(字體顏色白色)+enter才送出)) 不能多選
+Avalable 顯示日期時間
+Created 顯示日期時間
+要可以全選
+清空指定queue所有job 按鈕
+清空queue所有job 按鈕
+顯示display name
+payload不要顯示，雙擊該行˙payload才顯示在該行下面(不用雙擊payload欄位)
+-----------------------------------------------------
+
+http://127.0.0.1:10001/tool/page/queue/viewer?tab=queue&connection=database&db=mariadb&queue%5B0%5D=default&queue%5B1%5D=hahaha&queue%5B2%5D=frrr
+queue搜尋，功能改成點 queue 多選框以外加入 tag(不要加入按鈕)；可連續加入多個 queue。當輸入框為空時，再按一次 Enter 才會送出篩選
+
+-----------------------------------------------------
+
+http://127.0.0.1:10001/tool/page/log/viewer?log_directory=C%3A%5Cweb%5Cweb%5Chahaha_octane_codex%5Chahaha%5Cstorage%5Clogs&log_file=laravel.log&page=1
+所有按鈕都幫我加上hover效果
+
+-----------------------------------------------------
