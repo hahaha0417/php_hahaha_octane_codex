@@ -53,6 +53,82 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertSee('fail_queue');
     }
 
+    public function test_queue_viewer_page_uses_database_default_when_queue_database_connection_is_empty(): void
+    {
+        config()->set('database.default', 'mariadb');
+        config()->set('database.connections.mariadb', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ]);
+        config()->set('database.connections.aaa_first', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ]);
+        config()->set('queue.connections.database.connection', null);
+
+        Schema::connection('mariadb')->create('jobs', function (Blueprint $table): void {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        $response_ = $this->get('/tool/page/queue/viewer');
+
+        $response_->assertStatus(200);
+        $response_->assertSee('mariadb');
+        $response_->assertSee('已讀取 database queue 狀態。');
+        $response_->assertDontSee('讀取失敗：');
+    }
+
+    public function test_sqlite_database_config_uses_dedicated_sqlite_path_when_default_connection_is_not_sqlite(): void
+    {
+        $original_db_connection_ = $this->environment_value_capture_('DB_CONNECTION');
+        $original_db_database_ = $this->environment_value_capture_('DB_DATABASE');
+        $original_db_sqlite_database_ = $this->environment_value_capture_('DB_SQLITE_DATABASE');
+
+        $this->environment_value_set_('DB_CONNECTION', 'mariadb');
+        $this->environment_value_set_('DB_DATABASE', 'hahaha_octane_codex_hahaha');
+        $this->environment_value_set_('DB_SQLITE_DATABASE', null);
+
+        $database_config_ = require base_path('config/database.php');
+
+        $this->assertSame(
+            database_path('database.sqlite'),
+            $database_config_['connections']['sqlite']['database']
+        );
+
+        $this->environment_value_restore_('DB_CONNECTION', $original_db_connection_);
+        $this->environment_value_restore_('DB_DATABASE', $original_db_database_);
+        $this->environment_value_restore_('DB_SQLITE_DATABASE', $original_db_sqlite_database_);
+    }
+
+    public function test_sqlite_database_config_keeps_db_database_when_default_connection_is_sqlite(): void
+    {
+        $original_db_connection_ = $this->environment_value_capture_('DB_CONNECTION');
+        $original_db_database_ = $this->environment_value_capture_('DB_DATABASE');
+        $original_db_sqlite_database_ = $this->environment_value_capture_('DB_SQLITE_DATABASE');
+
+        $this->environment_value_set_('DB_CONNECTION', 'sqlite');
+        $this->environment_value_set_('DB_DATABASE', ':memory:');
+        $this->environment_value_set_('DB_SQLITE_DATABASE', null);
+
+        $database_config_ = require base_path('config/database.php');
+
+        $this->assertSame(':memory:', $database_config_['connections']['sqlite']['database']);
+
+        $this->environment_value_restore_('DB_CONNECTION', $original_db_connection_);
+        $this->environment_value_restore_('DB_DATABASE', $original_db_database_);
+        $this->environment_value_restore_('DB_SQLITE_DATABASE', $original_db_sqlite_database_);
+    }
+
     public function test_queue_viewer_page_can_switch_database_connection(): void
     {
         DB::connection('sqlite')->table('jobs')->insert([
@@ -258,6 +334,24 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertSee('最後');
         $response_->assertSee('is_disabled_', false);
         $response_->assertSee('pagination_page_link_', false);
+        $response_->assertSee('目前篩選 queue：全部 queue');
+        $response_->assertSee('data-queue-multiselect_', false);
+        $response_->assertSee('data-selected-queues_', false);
+        $response_->assertSee('data-queue-input_', false);
+        $response_->assertSee('可連續加入多個 queue');
+    }
+
+    public function test_fail_queue_page_keeps_delete_actions_visible_when_filtered_result_is_empty(): void
+    {
+        $response_ = $this->get('/tool/page/queue/viewer?tab=fail_queue&connection=database&db=sqlite&queue[0]=default&queue[1]=hahaha&queue[2]=frrr');
+
+        $response_->assertStatus(200);
+        $response_->assertSee('刪除多選');
+        $response_->assertSee('清空指定 queue 所有 job');
+        $response_->assertSee('清空 queue 所有 job');
+        $response_->assertSee('目前沒有可顯示的 failed jobs 資料。');
+        $response_->assertSee('form="fail_queue_bulk_delete_form_"', false);
+        $response_->assertSee('disabled', false);
     }
 
     public function test_queue_viewer_page_can_bulk_delete_failed_jobs(): void
@@ -451,5 +545,45 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertStatus(200);
         $response_->assertSee(Carbon::createFromTimestamp(1718323200, config('app.timezone'))->format('Y-m-d H:i:s'));
         $response_->assertSee(Carbon::createFromTimestamp(1718326800, config('app.timezone'))->format('Y-m-d H:i:s'));
+    }
+
+    private function environment_value_capture_(string $name_): array
+    {
+        return [
+            'env' => array_key_exists($name_, $_ENV) ? $_ENV[$name_] : null,
+            'server' => array_key_exists($name_, $_SERVER) ? $_SERVER[$name_] : null,
+            'putenv' => getenv($name_) === false ? null : getenv($name_),
+        ];
+    }
+
+    private function environment_value_restore_(string $name_, array $value_): void
+    {
+        $this->environment_value_set_($name_, $value_['putenv']);
+
+        if ($value_['env'] === null) {
+            unset($_ENV[$name_]);
+        } else {
+            $_ENV[$name_] = $value_['env'];
+        }
+
+        if ($value_['server'] === null) {
+            unset($_SERVER[$name_]);
+        } else {
+            $_SERVER[$name_] = $value_['server'];
+        }
+    }
+
+    private function environment_value_set_(string $name_, ?string $value_): void
+    {
+        if ($value_ === null) {
+            putenv($name_);
+            unset($_ENV[$name_], $_SERVER[$name_]);
+
+            return;
+        }
+
+        putenv($name_.'='.$value_);
+        $_ENV[$name_] = $value_;
+        $_SERVER[$name_] = $value_;
     }
 }

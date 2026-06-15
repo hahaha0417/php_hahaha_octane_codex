@@ -690,57 +690,99 @@
                     </article>
                 </section>
             @else
+                <section class="filter_grid_ is_single_">
+                    <section class="filter_box_">
+                        <label class="filter_label_">Queue</label>
+                        <form class="filter_form_" method="GET" action="{{ route($page_config_->Route_Name_) }}">
+                            <input type="hidden" name="tab" value="fail_queue">
+                            <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
+                            <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
+                            <div
+                                class="queue_multiselect_"
+                                data-queue-multiselect_
+                                data-selected-queues_='@json($page_config_->Selected_Queue_List_)'
+                            >
+                                <div class="queue_multiselect_tags_" data-queue-tags_></div>
+                                <input
+                                    class="queue_multiselect_input_"
+                                    type="text"
+                                    list="fail_queue_filter_options_"
+                                    placeholder="輸入 queue 後按 Enter，可多選"
+                                    data-queue-input_
+                                >
+                            </div>
+                            <datalist id="fail_queue_filter_options_">
+                                @foreach ($page_config_->Queue_Options_ as $queue_key_ => $queue_label_)
+                                    @continue($queue_key_ === '')
+                                    <option value="{{ $queue_key_ }}">{{ $queue_label_ }}</option>
+                                @endforeach
+                            </datalist>
+                            <div class="queue_filter_hint_">可輸入自訂 queue 名稱，按 Enter 先加入 tag；可連續加入多個 queue。當輸入框為空時，再按一次 Enter 才會送出篩選。</div>
+                        </form>
+                    </section>
+                </section>
+
                 <section class="section_grid_ is_single_">
                     <article class="data_panel_">
                         <h2 class="panel_title_">Failed Queue Jobs</h2>
+                        <div class="hint_text_">
+                            目前篩選 queue：{{ $queue_snapshot_['selected_queue'] !== '' ? $queue_snapshot_['selected_queue'] : '全部 queue' }}
+                        </div>
+
+                        <div class="action_row_">
+                            <button
+                                class="action_button_ is_danger_"
+                                type="submit"
+                                form="fail_queue_bulk_delete_form_"
+                                @disabled($queue_snapshot_['recent_failed_jobs'] === [])
+                            >
+                                刪除多選
+                            </button>
+                            <form class="inline_form_" method="POST" action="{{ route('tool.page.queue_viewer.fail_queue_clear_selected') }}">
+                                @csrf
+                                <input type="hidden" name="tab" value="fail_queue">
+                                <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
+                                <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
+                                @foreach ($page_config_->Selected_Queue_List_ as $selected_queue_name_)
+                                    <input type="hidden" name="selected_queue[]" value="{{ $selected_queue_name_ }}">
+                                @endforeach
+                                <input type="hidden" name="fail_queue_page" value="{{ $queue_snapshot_['fail_queue_pagination']['current_page'] ?? 1 }}">
+                                <button class="action_button_ is_danger_" type="submit" @disabled($page_config_->Selected_Queue_List_ === [])>清空指定 queue 所有 job</button>
+                            </form>
+                            <form class="inline_form_" method="POST" action="{{ route('tool.page.queue_viewer.fail_queue_clear_all') }}">
+                                @csrf
+                                <input type="hidden" name="tab" value="fail_queue">
+                                <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
+                                <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
+                                <input type="hidden" name="fail_queue_page" value="{{ $queue_snapshot_['fail_queue_pagination']['current_page'] ?? 1 }}">
+                                <button class="action_button_ is_danger_" type="submit">清空 queue 所有 job</button>
+                            </form>
+                            @if ($queue_snapshot_['fail_queue_pagination'] !== null)
+                                <form class="pagination_jump_ is_align_right_" method="GET" action="{{ route($page_config_->Route_Name_) }}">
+                                    <input type="hidden" name="tab" value="fail_queue">
+                                    <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
+                                    <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
+                                    @foreach ($page_config_->Selected_Queue_List_ as $selected_queue_name_)
+                                        <input type="hidden" name="queue[]" value="{{ $selected_queue_name_ }}">
+                                    @endforeach
+                                    <span class="pagination_jump_label_">總頁數 {{ $queue_snapshot_['fail_queue_pagination']['last_page'] }}</span>
+                                    <input
+                                        class="field_input_ pagination_jump_input_"
+                                        type="number"
+                                        name="fail_queue_page"
+                                        min="1"
+                                        max="{{ $queue_snapshot_['fail_queue_pagination']['last_page'] }}"
+                                        value="{{ $queue_snapshot_['fail_queue_pagination']['current_page'] }}"
+                                        aria-label="fail_queue page"
+                                    >
+                                    <button class="action_button_ is_primary_" type="submit">跳頁</button>
+                                </form>
+                            @endif
+                        </div>
 
                         @if ($queue_snapshot_['recent_failed_jobs'] === [])
                             <div class="empty_state_">目前沒有可顯示的 failed jobs 資料。</div>
                         @else
-                            @if ($queue_snapshot_['fail_queue_pagination'] !== null)
-                                <div class="action_row_">
-                                    <button class="action_button_ is_danger_" type="submit" form="fail_queue_bulk_delete_form_">刪除多選</button>
-                                    <form class="inline_form_" method="POST" action="{{ route('tool.page.queue_viewer.fail_queue_clear_selected') }}">
-                                        @csrf
-                                        <input type="hidden" name="tab" value="fail_queue">
-                                        <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
-                                        <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
-                                        @foreach ($page_config_->Selected_Queue_List_ as $selected_queue_name_)
-                                            <input type="hidden" name="selected_queue[]" value="{{ $selected_queue_name_ }}">
-                                        @endforeach
-                                        <input type="hidden" name="fail_queue_page" value="{{ $queue_snapshot_['fail_queue_pagination']['current_page'] ?? 1 }}">
-                                        <button class="action_button_ is_danger_" type="submit" @disabled($page_config_->Selected_Queue_List_ === [])>清空指定 queue 所有 job</button>
-                                    </form>
-                                    <form class="inline_form_" method="POST" action="{{ route('tool.page.queue_viewer.fail_queue_clear_all') }}">
-                                        @csrf
-                                        <input type="hidden" name="tab" value="fail_queue">
-                                        <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
-                                        <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
-                                        <input type="hidden" name="fail_queue_page" value="{{ $queue_snapshot_['fail_queue_pagination']['current_page'] ?? 1 }}">
-                                        <button class="action_button_ is_danger_" type="submit">清空 queue 所有 job</button>
-                                    </form>
-                                    <form class="pagination_jump_ is_align_right_" method="GET" action="{{ route($page_config_->Route_Name_) }}">
-                                        <input type="hidden" name="tab" value="fail_queue">
-                                        <input type="hidden" name="connection" value="{{ $page_config_->Selected_Connection_ }}">
-                                        <input type="hidden" name="db" value="{{ $page_config_->Selected_Database_ }}">
-                                        @foreach ($page_config_->Selected_Queue_List_ as $selected_queue_name_)
-                                            <input type="hidden" name="queue[]" value="{{ $selected_queue_name_ }}">
-                                        @endforeach
-                                        <span class="pagination_jump_label_">總頁數 {{ $queue_snapshot_['fail_queue_pagination']['last_page'] }}</span>
-                                        <input
-                                            class="field_input_ pagination_jump_input_"
-                                            type="number"
-                                            name="fail_queue_page"
-                                            min="1"
-                                            max="{{ $queue_snapshot_['fail_queue_pagination']['last_page'] }}"
-                                            value="{{ $queue_snapshot_['fail_queue_pagination']['current_page'] }}"
-                                            aria-label="fail_queue page"
-                                        >
-                                        <button class="action_button_ is_primary_" type="submit">跳頁</button>
-                                    </form>
-                                </div>
-                            @endif
-
                             <form id="fail_queue_bulk_delete_form_" method="POST" action="{{ route('tool.page.queue_viewer.fail_queue_bulk_delete') }}">
                                 @csrf
                                 <input type="hidden" name="tab" value="fail_queue">
@@ -860,7 +902,7 @@
                 route: `{{ $page_config_->Route_Name_ }}`
             </div>
         </main>
-        @if ($page_config_->Selected_Tab_ === 'queue')
+        @if (in_array($page_config_->Selected_Tab_, ['queue', 'fail_queue'], true))
             <script>
                 (function () {
                     const multiselect_wrap_ = document.querySelector('[data-queue-multiselect_]');

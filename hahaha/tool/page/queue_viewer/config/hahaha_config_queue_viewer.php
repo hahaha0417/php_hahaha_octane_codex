@@ -158,7 +158,11 @@ class hahaha_config_queue_viewer
             return (string) array_key_first($this->Database_Options_);
         }
 
-        $default_database_connection_ = (string) config('queue.connections.database.connection', config('database.default'));
+        $default_database_connection_ = (string) config('queue.connections.database.connection');
+
+        if ($default_database_connection_ === '') {
+            $default_database_connection_ = (string) config('database.default');
+        }
 
         if (array_key_exists($default_database_connection_, $this->Database_Options_)) {
             return $default_database_connection_;
