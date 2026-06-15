@@ -14,6 +14,7 @@
                     radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 26%),
                     radial-gradient(circle at top right, rgba(14, 165, 233, 0.14), transparent 28%),
                     linear-gradient(180deg, #020617 0%, #050b14 52%, #020617 100%);
+                overflow-x: clip;
             }
             .page_wrap_ { width: 100%; max-width: none; margin: 0; padding: 28px 18px 56px; }
             .hero_panel_ {
@@ -107,6 +108,13 @@
                 gap: 10px;
                 align-items: center;
             }
+            .queue_multiselect_entry_ {
+                display: flex;
+                flex: 1 1 320px;
+                align-items: center;
+                gap: 10px;
+                min-width: 0;
+            }
             .queue_multiselect_tag_ {
                 display: inline-flex;
                 align-items: center;
@@ -117,6 +125,8 @@
                 background: #334155;
                 color: #f8fafc;
                 line-height: 1;
+                max-width: 100%;
+                overflow-wrap: anywhere;
             }
             .queue_multiselect_remove_ {
                 display: inline-flex;
@@ -217,6 +227,8 @@
                 text-decoration: none;
                 font: inherit;
                 cursor: pointer;
+                max-width: 100%;
+                overflow-wrap: anywhere;
             }
             .action_button_.is_primary_ { background: #475569; border-color: #475569; color: #f8fafc; font-weight: 700; }
             .action_button_.is_danger_ { background: rgba(127, 29, 29, 0.92); border-color: rgba(248, 113, 113, 0.44); color: #fee2e2; }
@@ -225,7 +237,12 @@
                 cursor: not-allowed;
                 pointer-events: none;
             }
-            .table_wrap_ { overflow-x: auto; }
+            .table_wrap_ {
+                max-width: 100%;
+                overflow-x: hidden;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
             table { width: 100%; border-collapse: collapse; }
             th, td {
                 padding: 12px 10px;
@@ -319,8 +336,135 @@
                 font-size: 13px;
                 line-height: 1.7;
             }
-            @media (max-width: 980px) {
+            @media (max-width: 1400px) {
                 .filter_grid_, .summary_grid_, .section_grid_ { grid-template-columns: 1fr; }
+                .page_wrap_ { padding: 18px 12px 40px; }
+                .hero_panel_, .filter_box_, .data_panel_, .summary_card_ { min-width: 0; padding: 18px; }
+                .hero_copy_, .hint_text_, .footer_, .status_panel_, .pagination_info_ { overflow-wrap: anywhere; }
+                .queue_multiselect_,
+                .queue_multiselect_tags_,
+                .queue_multiselect_entry_,
+                .queue_multiselect_input_ {
+                    min-width: 0;
+                }
+                .responsive_table_ {
+                    min-width: 0;
+                    table-layout: fixed;
+                }
+                .responsive_table_ th,
+                .responsive_table_ td {
+                    white-space: normal;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
+                }
+                .column_optional_md_ {
+                    display: none;
+                }
+            }
+            @media (max-width: 1100px) {
+                .column_optional_sm_ {
+                    display: none;
+                }
+            }
+            @media (max-width: 799px) {
+                .tab_nav_, .switcher_, .pagination_links_, .action_row_ { width: 100%; }
+                .tab_link_, .switcher_link_, .action_button_, .ghost_button_, .inline_form_ {
+                    width: 100%;
+                }
+                .inline_form_ button,
+                .inline_form_ .action_button_ {
+                    width: 100%;
+                }
+                .action_row_ {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+                .pagination_jump_,
+                .pagination_jump_.is_align_right_,
+                .pagination_bar_,
+                .pagination_bar_.is_right_ {
+                    width: 100%;
+                    margin-left: 0;
+                    justify-content: stretch;
+                }
+                .pagination_jump_ {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+                .pagination_jump_input_ {
+                    width: 100%;
+                }
+                .queue_multiselect_,
+                .queue_multiselect_tags_,
+                .queue_multiselect_entry_,
+                .queue_multiselect_input_ {
+                    width: 100%;
+                }
+                .queue_multiselect_entry_ {
+                    flex-wrap: wrap;
+                }
+                .queue_multiselect_tags_ {
+                    gap: 8px;
+                }
+                .table_wrap_ {
+                    overflow-x: visible;
+                }
+                .responsive_table_ {
+                    min-width: 0;
+                    table-layout: auto;
+                }
+                .responsive_table_ thead {
+                    display: none;
+                }
+                .responsive_table_,
+                .responsive_table_ tbody,
+                .responsive_table_ tr,
+                .responsive_table_ td {
+                    display: block;
+                    width: 100%;
+                }
+                .responsive_table_ tbody {
+                    display: grid;
+                    gap: 14px;
+                }
+                .responsive_table_ tr {
+                    border: 1px solid rgba(51, 65, 85, 0.92);
+                    border-radius: 18px;
+                    background: rgba(2, 6, 23, 0.74);
+                    overflow: hidden;
+                    min-width: 0;
+                }
+                .responsive_table_ td {
+                    display: grid;
+                    grid-template-columns: minmax(92px, 120px) minmax(0, 1fr);
+                    gap: 12px;
+                    align-items: start;
+                    white-space: normal;
+                    padding: 12px 14px;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
+                }
+                .responsive_table_ td::before {
+                    content: attr(data-label);
+                    color: #94a3b8;
+                    font-size: 12px;
+                    font-weight: 800;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                }
+                .responsive_table_ .checkbox_cell_ {
+                    width: 100%;
+                }
+                .responsive_table_ .payload_detail_cell_ {
+                    display: block;
+                    padding: 0;
+                }
+                .responsive_table_ .payload_detail_cell_::before {
+                    content: none;
+                }
+                .payload_cell_ {
+                    max-width: none;
+                }
             }
         </style>
     </head>
@@ -490,13 +634,15 @@
                                 data-selected-queues_='@json($page_config_->Selected_Queue_List_)'
                             >
                                 <div class="queue_multiselect_tags_" data-queue-tags_></div>
-                                <input
-                                    class="queue_multiselect_input_"
-                                    type="text"
-                                    list="queue_filter_options_"
-                                    placeholder="輸入 queue 後按 Enter，可多選"
-                                    data-queue-input_
-                                >
+                                <div class="queue_multiselect_entry_">
+                                    <input
+                                        class="queue_multiselect_input_"
+                                        type="text"
+                                        list="queue_filter_options_"
+                                        placeholder="輸入 queue 後按 Enter 或點外面"
+                                        data-queue-input_
+                                    >
+                                </div>
                             </div>
                             <datalist id="queue_filter_options_">
                                 @foreach ($page_config_->Queue_Options_ as $queue_key_ => $queue_label_)
@@ -504,7 +650,7 @@
                                     <option value="{{ $queue_key_ }}">{{ $queue_label_ }}</option>
                                 @endforeach
                             </datalist>
-                            <div class="queue_filter_hint_">可輸入自訂 queue 名稱，按 Enter 先加入 tag；可連續加入多個 queue。當輸入框為空時，再按一次 Enter 才會送出篩選。</div>
+                            <div class="queue_filter_hint_">queue 搜尋，點 queue 多選框以外加入 tag；可連續加入多個 queue。當輸入框為空時，再按一次 Enter 才會送出篩選。</div>
                         </form>
                     </section>
                 </section>
@@ -577,7 +723,7 @@
                             </form>
 
                             <div class="table_wrap_">
-                                <table>
+                                <table class="responsive_table_">
                                     <thead>
                                         <tr>
                                             <th class="checkbox_cell_">
@@ -585,9 +731,9 @@
                                             </th>
                                             <th>ID</th>
                                             <th>Queue</th>
-                                            <th>Display Name</th>
-                                            <th>Attempts</th>
-                                            <th>Reserved</th>
+                                            <th class="column_optional_md_">Display Name</th>
+                                            <th class="column_optional_sm_">Attempts</th>
+                                            <th class="column_optional_md_">Reserved</th>
                                             <th>Available</th>
                                             <th>Created</th>
                                             <th>操作</th>
@@ -596,17 +742,17 @@
                                     <tbody>
                                         @foreach ($queue_snapshot_['recent_jobs'] as $job_row_)
                                             <tr data-queue-row_ data-job-id_="{{ $job_row_['id'] }}" data-job-queue_="{{ $job_row_['queue'] }}" data-job-display-name_="{{ $job_row_['display_name'] }}" data-job-payload_="{{ base64_encode($job_row_['payload']) }}">
-                                                <td class="checkbox_cell_">
+                                                <td class="checkbox_cell_" data-label="選取">
                                                     <input type="checkbox" name="selected_job_ids[]" value="{{ $job_row_['id'] }}" form="queue_bulk_delete_form_" data-queue-select-item_>
                                                 </td>
-                                                <td>{{ $job_row_['id'] }}</td>
-                                                <td>{{ $job_row_['queue'] }}</td>
-                                                <td>{{ $job_row_['display_name'] }}</td>
-                                                <td>{{ $job_row_['attempts'] }}</td>
-                                                <td>{{ $job_row_['reserved_at'] }}</td>
-                                                <td>{{ $job_row_['available_at'] }}</td>
-                                                <td>{{ $job_row_['created_at'] }}</td>
-                                                <td>
+                                                <td data-label="ID">{{ $job_row_['id'] }}</td>
+                                                <td data-label="Queue">{{ $job_row_['queue'] }}</td>
+                                                <td class="column_optional_md_" data-label="Display Name">{{ $job_row_['display_name'] }}</td>
+                                                <td class="column_optional_sm_" data-label="Attempts">{{ $job_row_['attempts'] }}</td>
+                                                <td class="column_optional_md_" data-label="Reserved">{{ $job_row_['reserved_at'] }}</td>
+                                                <td data-label="Available">{{ $job_row_['available_at'] }}</td>
+                                                <td data-label="Created">{{ $job_row_['created_at'] }}</td>
+                                                <td data-label="操作">
                                                     <div class="action_row_">
                                                         <form class="inline_form_" method="POST" action="{{ route('tool.page.queue_viewer.queue_delete', ['job_id' => $job_row_['id']]) }}">
                                                             @csrf
@@ -703,13 +849,15 @@
                                 data-selected-queues_='@json($page_config_->Selected_Queue_List_)'
                             >
                                 <div class="queue_multiselect_tags_" data-queue-tags_></div>
-                                <input
-                                    class="queue_multiselect_input_"
-                                    type="text"
-                                    list="fail_queue_filter_options_"
-                                    placeholder="輸入 queue 後按 Enter，可多選"
-                                    data-queue-input_
-                                >
+                                <div class="queue_multiselect_entry_">
+                                    <input
+                                        class="queue_multiselect_input_"
+                                        type="text"
+                                        list="fail_queue_filter_options_"
+                                        placeholder="輸入 queue 後按 Enter 或點外面"
+                                        data-queue-input_
+                                    >
+                                </div>
                             </div>
                             <datalist id="fail_queue_filter_options_">
                                 @foreach ($page_config_->Queue_Options_ as $queue_key_ => $queue_label_)
@@ -717,7 +865,7 @@
                                     <option value="{{ $queue_key_ }}">{{ $queue_label_ }}</option>
                                 @endforeach
                             </datalist>
-                            <div class="queue_filter_hint_">可輸入自訂 queue 名稱，按 Enter 先加入 tag；可連續加入多個 queue。當輸入框為空時，再按一次 Enter 才會送出篩選。</div>
+                            <div class="queue_filter_hint_">queue 搜尋，點 queue 多選框以外加入 tag；可連續加入多個 queue。當輸入框為空時，再按一次 Enter 才會送出篩選。</div>
                         </form>
                     </section>
                 </section>
@@ -795,17 +943,17 @@
                             </form>
 
                             <div class="table_wrap_">
-                                <table>
+                                <table class="responsive_table_">
                                     <thead>
                                         <tr>
                                             <th class="checkbox_cell_">
                                                 <input type="checkbox" aria-label="全選 failed jobs" data-failed-queue-select-all_>
                                             </th>
                                             <th>ID</th>
-                                            <th>UUID</th>
-                                            <th>Connection</th>
+                                            <th class="column_optional_md_">UUID</th>
+                                            <th class="column_optional_sm_">Connection</th>
                                             <th>Queue</th>
-                                            <th>Display Name</th>
+                                            <th class="column_optional_md_">Display Name</th>
                                             <th>Failed At</th>
                                             <th>操作</th>
                                         </tr>
@@ -813,16 +961,16 @@
                                     <tbody>
                                         @foreach ($queue_snapshot_['recent_failed_jobs'] as $failed_job_row_)
                                             <tr data-failed-queue-row_ data-failed-job-id_="{{ $failed_job_row_['id'] }}" data-failed-job-queue_="{{ $failed_job_row_['queue'] }}" data-failed-job-display-name_="{{ $failed_job_row_['display_name'] }}" data-failed-job-payload_="{{ base64_encode($failed_job_row_['payload']) }}">
-                                                <td class="checkbox_cell_">
+                                                <td class="checkbox_cell_" data-label="選取">
                                                     <input type="checkbox" name="selected_failed_job_ids[]" value="{{ $failed_job_row_['id'] }}" form="fail_queue_bulk_delete_form_" data-failed-queue-select-item_>
                                                 </td>
-                                                <td>{{ $failed_job_row_['id'] }}</td>
-                                                <td>{{ $failed_job_row_['uuid'] }}</td>
-                                                <td>{{ $failed_job_row_['connection'] }}</td>
-                                                <td>{{ $failed_job_row_['queue'] }}</td>
-                                                <td>{{ $failed_job_row_['display_name'] }}</td>
-                                                <td>{{ $failed_job_row_['failed_at'] }}</td>
-                                                <td>
+                                                <td data-label="ID">{{ $failed_job_row_['id'] }}</td>
+                                                <td class="column_optional_md_" data-label="UUID">{{ $failed_job_row_['uuid'] }}</td>
+                                                <td class="column_optional_sm_" data-label="Connection">{{ $failed_job_row_['connection'] }}</td>
+                                                <td data-label="Queue">{{ $failed_job_row_['queue'] }}</td>
+                                                <td class="column_optional_md_" data-label="Display Name">{{ $failed_job_row_['display_name'] }}</td>
+                                                <td data-label="Failed At">{{ $failed_job_row_['failed_at'] }}</td>
+                                                <td data-label="操作">
                                                     <div class="action_row_">
                                                         <form class="inline_form_" method="POST" action="{{ route('tool.page.queue_viewer.fail_queue_delete', ['job_id' => $failed_job_row_['id']]) }}">
                                                             @csrf
@@ -918,6 +1066,7 @@
                     }
 
                     let selected_queue_list_ = [];
+                    let is_empty_enter_submit_ready_ = false;
 
                     try {
                         const parsed_selected_queue_list_ = JSON.parse(multiselect_wrap_.dataset.selectedQueues_ ?? '[]');
@@ -977,10 +1126,49 @@
                         }
 
                         selected_queue_list_.push(normalized_queue_name_);
+                        is_empty_enter_submit_ready_ = false;
                         queue_hidden_inputs_sync_();
                         queue_tag_render_();
                         input_.value = '';
                     };
+
+                    input_.addEventListener('input', () => {
+                        is_empty_enter_submit_ready_ = false;
+                    });
+
+                    input_.addEventListener('blur', () => {
+                        is_empty_enter_submit_ready_ = false;
+                    });
+
+                    multiselect_wrap_.addEventListener('click', (event_) => {
+                        const target_ = event_.target;
+                        if (!(target_ instanceof Element)) {
+                            return;
+                        }
+
+                        if (target_.closest('.queue_multiselect_remove_')) {
+                            return;
+                        }
+
+                        if (! target_.closest('[data-queue-input_]')) {
+                            input_.focus();
+                        }
+                    });
+
+                    document.addEventListener('click', (event_) => {
+                        const target_ = event_.target;
+                        if (!(target_ instanceof Node) || multiselect_wrap_.contains(target_)) {
+                            return;
+                        }
+
+                        if (input_.value.trim() === '') {
+                            is_empty_enter_submit_ready_ = false;
+
+                            return;
+                        }
+
+                        queue_add_(input_.value);
+                    });
 
                     input_.addEventListener('keydown', (event_) => {
                         if (event_.key !== 'Enter') {
@@ -994,10 +1182,17 @@
                             return;
                         }
 
+                        if (! is_empty_enter_submit_ready_) {
+                            is_empty_enter_submit_ready_ = true;
+
+                            return;
+                        }
+
                         form_.requestSubmit();
                     });
 
                     form_.addEventListener('submit', () => {
+                        is_empty_enter_submit_ready_ = false;
                         queue_add_(input_.value);
                     });
 

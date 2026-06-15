@@ -338,6 +338,8 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertSee('data-queue-multiselect_', false);
         $response_->assertSee('data-selected-queues_', false);
         $response_->assertSee('data-queue-input_', false);
+        $response_->assertDontSee('data-queue-add_', false);
+        $response_->assertDontSee('>加入<', false);
         $response_->assertSee('可連續加入多個 queue');
     }
 
@@ -352,6 +354,26 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertSee('目前沒有可顯示的 failed jobs 資料。');
         $response_->assertSee('form="fail_queue_bulk_delete_form_"', false);
         $response_->assertSee('disabled', false);
+    }
+
+    public function test_fail_queue_page_renders_responsive_table_markup(): void
+    {
+        DB::connection('sqlite')->table('failed_jobs')->insert([
+            'uuid' => 'responsive-failed-1',
+            'connection' => 'database',
+            'queue' => 'emails',
+            'payload' => '{"displayName":"ResponsiveFailed"}',
+            'exception' => 'Example exception',
+            'failed_at' => now(),
+        ]);
+
+        $response_ = $this->get('/tool/page/queue/viewer?tab=fail_queue&connection=database&db=sqlite');
+
+        $response_->assertStatus(200);
+        $response_->assertSee('class="responsive_table_"', false);
+        $response_->assertSee('data-label="Queue"', false);
+        $response_->assertSee('data-label="Failed At"', false);
+        $response_->assertSee('data-label="操作"', false);
     }
 
     public function test_queue_viewer_page_can_bulk_delete_failed_jobs(): void
@@ -510,6 +532,8 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertSee('data-queue-multiselect_', false);
         $response_->assertSee('data-selected-queues_', false);
         $response_->assertSee('data-queue-input_', false);
+        $response_->assertDontSee('data-queue-add_', false);
+        $response_->assertDontSee('>加入<', false);
         $response_->assertSee('datalist', false);
         $response_->assertSee('可連續加入多個 queue');
         $response_->assertSee('data-queue-shortcuts_', false);
@@ -527,6 +551,7 @@ class hahaha_test_queue_viewer extends TestCase
         $response_->assertSee('目前篩選 queue：test');
         $response_->assertSee('"test"', false);
         $response_->assertSee('data-selected-queues_', false);
+        $response_->assertDontSee('data-queue-add_', false);
     }
 
     public function test_queue_viewer_page_displays_available_and_created_as_datetime(): void
