@@ -131,6 +131,14 @@
                 color: var(--text-soft);
                 font: inherit;
                 cursor: pointer;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+            }
+            .directory_toggle_button_:hover {
+                border-color: rgba(125, 211, 252, 0.64);
+                background: rgba(51, 65, 85, 0.96);
+                color: #ffffff;
+                box-shadow: 0 10px 24px rgba(56, 189, 248, 0.16);
+                transform: translateY(-1px);
             }
             .directory_options_panel_ {
                 position: absolute;
@@ -161,6 +169,13 @@
                 font: inherit;
                 text-align: left;
                 cursor: pointer;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+            }
+            .directory_option_button_:hover {
+                border-color: rgba(125, 211, 252, 0.52);
+                background: rgba(30, 41, 59, 0.82);
+                box-shadow: 0 10px 24px rgba(56, 189, 248, 0.12);
+                transform: translateY(-1px);
             }
             .directory_option_button_.is_active_ {
                 border-color: var(--line-strong);
@@ -193,6 +208,12 @@
                 font: inherit;
                 font-weight: 700;
                 cursor: pointer;
+                transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+            }
+            .submit_button_:hover {
+                filter: brightness(1.05);
+                box-shadow: 0 14px 30px rgba(249, 115, 22, 0.24);
+                transform: translateY(-1px);
             }
             .secondary_button_ {
                 padding: 14px 20px;
@@ -203,6 +224,14 @@
                 font: inherit;
                 font-weight: 700;
                 cursor: pointer;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+            }
+            .secondary_button_:hover {
+                border-color: rgba(125, 211, 252, 0.58);
+                background: rgba(30, 41, 59, 0.9);
+                color: #ffffff;
+                box-shadow: 0 12px 28px rgba(56, 189, 248, 0.14);
+                transform: translateY(-1px);
             }
             #search_button_,
             #clear_button_ {
@@ -276,6 +305,13 @@
                 text-align: left;
                 background: rgba(15, 23, 42, 0.42);
                 cursor: pointer;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+            }
+            .file_link_:hover {
+                border-color: rgba(125, 211, 252, 0.48);
+                background: rgba(30, 41, 59, 0.78);
+                box-shadow: 0 12px 28px rgba(56, 189, 248, 0.12);
+                transform: translateY(-1px);
             }
             .file_link_.is_active_ {
                 border-color: var(--line-strong);
@@ -371,6 +407,14 @@
                 color: var(--text-main);
                 font: inherit;
                 cursor: pointer;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+            }
+            .pagination_button_:hover {
+                border-color: rgba(125, 211, 252, 0.58);
+                background: rgba(30, 41, 59, 0.92);
+                color: #ffffff;
+                box-shadow: 0 12px 28px rgba(56, 189, 248, 0.14);
+                transform: translateY(-1px);
             }
             .pagination_button_:disabled {
                 opacity: 0.45;
@@ -380,6 +424,12 @@
                 border-color: var(--line-strong);
                 background: rgba(245, 158, 11, 0.18);
                 color: var(--accent-soft);
+            }
+            .pagination_button_.is_active_:hover {
+                border-color: rgba(252, 211, 77, 0.82);
+                background: rgba(245, 158, 11, 0.24);
+                color: #fef3c7;
+                box-shadow: 0 12px 28px rgba(245, 158, 11, 0.18);
             }
             .pagination_jump_ {
                 display: inline-flex;

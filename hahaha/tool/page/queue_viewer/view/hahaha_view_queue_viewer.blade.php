@@ -49,6 +49,14 @@
                 font-size: 14px;
                 font-weight: 700;
                 letter-spacing: 0.04em;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+            }
+            .tab_link_:hover {
+                color: #f8fafc;
+                border-color: rgba(125, 211, 252, 0.82);
+                background: rgba(30, 41, 59, 0.98);
+                box-shadow: 0 12px 28px rgba(14, 165, 233, 0.16);
+                transform: translateY(-1px);
             }
             .tab_link_.is_active_ { color: #f8fafc; background: #475569; border-color: #475569; }
             .status_panel_ {
@@ -164,6 +172,14 @@
                 color: #e2e8f0;
                 text-decoration: none;
                 background: rgba(15, 23, 42, 0.92);
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+            }
+            .switcher_link_:hover {
+                color: #f8fafc;
+                border-color: rgba(125, 211, 252, 0.82);
+                background: rgba(30, 41, 59, 0.98);
+                box-shadow: 0 10px 24px rgba(14, 165, 233, 0.14);
+                transform: translateY(-1px);
             }
             .switcher_link_.is_active_ {
                 color: #f8fafc;
@@ -229,9 +245,33 @@
                 cursor: pointer;
                 max-width: 100%;
                 overflow-wrap: anywhere;
+                transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+            }
+            .action_button_:hover, .ghost_button_:hover {
+                color: #f8fafc;
+                border-color: rgba(125, 211, 252, 0.82);
+                background: rgba(30, 41, 59, 0.98);
+                box-shadow: 0 12px 28px rgba(14, 165, 233, 0.14);
+                transform: translateY(-1px);
             }
             .action_button_.is_primary_ { background: #475569; border-color: #475569; color: #f8fafc; font-weight: 700; }
             .action_button_.is_danger_ { background: rgba(127, 29, 29, 0.92); border-color: rgba(248, 113, 113, 0.44); color: #fee2e2; }
+            .action_button_.is_primary_:hover {
+                border-color: #7dd3fc;
+                background: #64748b;
+                box-shadow: 0 12px 28px rgba(100, 116, 139, 0.32);
+            }
+            .action_button_.is_danger_:hover {
+                border-color: rgba(252, 165, 165, 0.9);
+                background: rgba(153, 27, 27, 0.98);
+                color: #fff1f2;
+                box-shadow: 0 12px 28px rgba(239, 68, 68, 0.22);
+            }
+            .pagination_page_link_.is_active_:hover,
+            .tab_link_.is_active_:hover,
+            .switcher_link_.is_active_:hover {
+                transform: none;
+            }
             .ghost_button_.is_disabled_ {
                 opacity: 0.45;
                 cursor: not-allowed;
