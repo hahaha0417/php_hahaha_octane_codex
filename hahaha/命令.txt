@@ -1,5 +1,8 @@
+# 這些沒用，重疊太高
 php artisan app:hahaha-cache-ai-context
 php artisan app:hahaha-cache-code-summary
 php artisan app:hahaha-cache-project-structure
+# 跑這兩個就好
 php artisan app:hahaha-cache-node-project-analysis
+php artisan app:hahaha-cache-work-target-analysis
 php artisan db:hahaha_command_db_table_enum_generate
