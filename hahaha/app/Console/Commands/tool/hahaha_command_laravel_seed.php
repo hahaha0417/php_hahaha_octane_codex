@@ -100,7 +100,7 @@ class hahaha_command_laravel_seed extends Command
                 continue;
             }
 
-            $absolute_seeder_path_ = $this->path_absolute_resolve_($resolved_seeder_path_);
+            $absolute_seeder_path_ = $this->Path_Absolute_Resolve($resolved_seeder_path_);
 
             if (File::isFile($absolute_seeder_path_)) {
                 $resolved_seeder_files_[] = $absolute_seeder_path_;
@@ -218,7 +218,7 @@ class hahaha_command_laravel_seed extends Command
 
     private function path_absolute_resolve_(string $path_input_): string
     {
-        if ($this->path_is_absolute_($path_input_)) {
+        if ($this->Path_Is_Absolute($path_input_)) {
             return $path_input_;
         }
 

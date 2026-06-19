@@ -233,7 +233,7 @@ class hahaha_command_laravel_migrate extends Command
     private function list_items_include_absolute_path_(array $paths_): bool
     {
         foreach ($paths_ as $path_) {
-            if ($this->path_is_absolute_($path_)) {
+            if ($this->Path_Is_Absolute($path_)) {
                 return true;
             }
         }
@@ -257,7 +257,7 @@ class hahaha_command_laravel_migrate extends Command
 
     private function migrate_path_absolute_resolve_(string $migrate_path_): string
     {
-        if ($this->path_is_absolute_($migrate_path_)) {
+        if ($this->Path_Is_Absolute($migrate_path_)) {
             return $migrate_path_;
         }
 

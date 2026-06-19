@@ -35,4 +35,50 @@ return [
         ],
     ],
 
+    'trello' => [
+        'base_url' => env('TRELLO_BASE_URL', 'https://api.trello.com/1'),
+        'key' => env('TRELLO_KEY'),
+        'token' => env('TRELLO_TOKEN'),
+        'timeout' => env('TRELLO_TIMEOUT', 10),
+        'connect_timeout' => env('TRELLO_CONNECT_TIMEOUT', 3),
+    ],
+
+    'jira' => [
+        'base_url' => env('JIRA_BASE_URL'),
+        'agile_base_url' => env('JIRA_AGILE_BASE_URL'),
+        'email' => env('JIRA_EMAIL'),
+        'api_token' => env('JIRA_API_TOKEN'),
+        'timeout' => env('JIRA_TIMEOUT', 10),
+        'connect_timeout' => env('JIRA_CONNECT_TIMEOUT', 3),
+    ],
+
+    'github' => [
+        'base_url' => env('GITHUB_BASE_URL', 'https://api.github.com'),
+        'token' => env('GITHUB_TOKEN'),
+        'api_version' => env('GITHUB_API_VERSION', '2022-11-28'),
+        'timeout' => env('GITHUB_TIMEOUT', 10),
+        'connect_timeout' => env('GITHUB_CONNECT_TIMEOUT', 3),
+    ],
+
+    'outlook' => [
+        'base_url' => env('OUTLOOK_BASE_URL', 'https://graph.microsoft.com/v1.0'),
+        'token' => env('OUTLOOK_TOKEN'),
+        'timeout' => env('OUTLOOK_TIMEOUT', 10),
+        'connect_timeout' => env('OUTLOOK_CONNECT_TIMEOUT', 3),
+    ],
+
+    'gmail' => [
+        'base_url' => env('GMAIL_BASE_URL', 'https://gmail.googleapis.com/gmail/v1'),
+        'token' => env('GMAIL_TOKEN'),
+        'timeout' => env('GMAIL_TIMEOUT', 10),
+        'connect_timeout' => env('GMAIL_CONNECT_TIMEOUT', 3),
+    ],
+
+    'line' => [
+        'base_url' => env('LINE_BASE_URL', 'https://api.line.me/v2/bot'),
+        'channel_access_token' => env('LINE_CHANNEL_ACCESS_TOKEN'),
+        'timeout' => env('LINE_TIMEOUT', 10),
+        'connect_timeout' => env('LINE_CONNECT_TIMEOUT', 3),
+    ],
+
 ];

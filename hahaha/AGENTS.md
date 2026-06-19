@@ -200,6 +200,9 @@ $this->app->singleton(Service::class, fn () => new Service(fn () => request()));
 - 規則：若既有方法命名已採 `xxx_` 前綴，新增方法需延續。
   - 建議：`Order_Create`、`Discount_Apply`
   - 避免：同一類別混用 `createOrder()` 與 `order_create_`
+- 規則：PHP class、function、變數不要使用 `private` 或 `protected`，全部使用 `public`。
+  - 建議：`public string $Order_Total;`、`public function Order_Create(): void`
+  - 避免：`private string $orderTotal;`、`protected function createOrder(): void`
 - 規則：常數名稱使用 `XXX_XXX`（全大寫底線）。
   - 建議：`MAX_RETRY_COUNT`、`DEFAULT_TIMEOUT_SECONDS`
   - 避免：`MaxRetryCount`、`default_timeout_seconds`
@@ -300,3 +303,51 @@ $this->app->singleton(Service::class, fn () => new Service(fn () => request()));
   - 補 route
   - 刷新 classmap / autoload
   - 重建 node 分析快取
+
+## library / Tests 規範
+
+- 規則：`library/hahaha_laravel_lib` 是本專案 Laravel library 原始碼的主要位置，新增或調整 library 相關類別時，優先放在這個目錄下並依現有子目錄結構延伸。
+  - 目前範例：`library/hahaha_laravel_lib/Console/Commands/...`
+  - 目前範例：`library/hahaha_laravel_lib/Services/...`
+  - 目前範例：`library/hahaha_laravel_lib/Providers/...`
+- 規則：`library/hahaha_laravel_lib` 內的測試檔固定放在 `library/hahaha_laravel_lib/Tests`，不要改放到根目錄 `tests/`。
+  - 建議：`library/hahaha_laravel_lib/Tests/Services/agents/skills/github/hahaha_test_agents_skills_github_service_Test.php`
+  - 建議：`library/hahaha_laravel_lib/Tests/Console/Commands/ai/node/hahaha_test_cache_node_project_analysis_command_Test.php`
+  - 避免：`tests/Feature/HahahaAgentSkillGithubServiceTest.php`
+- 規則：`library/hahaha_laravel_lib/Tests` 內的資料夾層級應盡量對應 `library/hahaha_laravel_lib` 被測類別的結構，方便從原始碼直接找到對應測試。
+  - 建議：`Services/agents/skills/github/...` 對應 `library/hahaha_laravel_lib/Services/agents/skills/github/...`
+  - 建議：`Console/Commands/ai/node/...` 對應 `library/hahaha_laravel_lib/Console/Commands/ai/node/...`
+- 規則：只要需求明確屬於 `library/hahaha_laravel_lib`，Codex 預設應先到 `library/hahaha_laravel_lib` 與 `library/hahaha_laravel_lib/Tests` 找相關檔案，再決定是否需要查看其他區域。
+
+## app / Tests 規範
+
+- 規則：`app` 是本專案應用層原始碼的主要位置，新增或調整 application 相關類別時，優先放在 `app` 下既有結構中，例如 `Console`、`Http`、`Jobs`、`Models`、`Providers`、`Enums`。
+  - 目前範例：`app/Console/Commands/...`
+  - 目前範例：`app/Http/Controllers/...`
+  - 目前範例：`app/Jobs/...`
+  - 目前範例：`app/Models/...`
+- 規則：`app` 相關測試檔固定放在 `app/Tests`，不要預設改放到根目錄 `tests/`。
+  - 建議：`app/Tests/Http/Controllers/backend/animal/hahaha_test_backend_animal_controller_Test.php`
+  - 建議：`app/Tests/Console/Commands/tool/hahaha_test_laravel_migrate_command_Test.php`
+  - 避免：`tests/Feature/HahahaBackendAnimalControllerTest.php`
+- 規則：`app/Tests` 內的資料夾層級應盡量對應 `app` 被測類別的結構，方便從原始碼直接找到對應測試。
+  - 建議：`Http/Controllers/backend/animal/...` 對應 `app/Http/Controllers/backend/animal/...`
+  - 建議：`Console/Commands/tool/...` 對應 `app/Console/Commands/tool/...`
+  - 建議：`Jobs/...` 對應 `app/Jobs/...`
+- 規則：只要需求明確屬於 `app`，Codex 預設應先到 `app` 與 `app/Tests` 找相關檔案，再決定是否需要查看 `code/`、`resources/`、`routes/` 或其他區域。
+
+## code / code_tests 規範
+
+- 規則：`code` 是本專案自訂 classmap PHP 原始碼位置之一，新增或調整 `code` 相關類別時，優先沿用 `code` 內既有結構，例如 `config`、`enum`、`parameter`、`trait`。
+  - 目前範例：`code/config/...`
+  - 目前範例：`code/enum/...`
+  - 目前範例：`code/parameter/...`
+  - 目前範例：`code/trait/...`
+- 規則：`code` 相關正式測試檔目標位置固定為 `code/code_tests`，不要把它當成預設放在根目錄 `tests/` 的區域。
+  - 建議：`code/code_tests/config/...`
+  - 建議：`code/code_tests/enum/...`
+  - 避免：`tests/Feature/...`
+  - 避免：`tests/Unit/...`
+- 規則：若工具或 Laravel 預設流程產生的測試檔先落在根目錄 `tests/`，必須手動整理到 `code/code_tests`，不要直接保留在根目錄。
+- 規則：未經使用者明確要求，不要隨便幫 `code` 區域新增測試檔；若需求只是調整規則、閱讀程式、或小幅修改邏輯，不要主動補測試。
+- 規則：只要需求明確屬於 `code`，Codex 預設應先到 `code` 與 `code/code_tests` 找相關檔案，再決定是否需要查看 `app/`、`resources/`、`routes/` 或其他區域。

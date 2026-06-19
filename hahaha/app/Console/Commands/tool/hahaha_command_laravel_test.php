@@ -89,7 +89,7 @@ class hahaha_command_laravel_test extends Command
                 continue;
             }
 
-            $absolute_test_path_ = $this->path_absolute_resolve_($resolved_test_path_);
+            $absolute_test_path_ = $this->Path_Absolute_Resolve($resolved_test_path_);
 
             if (File::isFile($absolute_test_path_)) {
                 if (! $this->test_file_name_is_supported_(basename($absolute_test_path_))) {
@@ -249,7 +249,7 @@ class hahaha_command_laravel_test extends Command
 
     private function path_absolute_resolve_(string $path_input_): string
     {
-        if ($this->path_is_absolute_($path_input_)) {
+        if ($this->Path_Is_Absolute($path_input_)) {
             return $path_input_;
         }
 
