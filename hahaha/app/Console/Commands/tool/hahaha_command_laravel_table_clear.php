@@ -48,9 +48,9 @@ class hahaha_command_laravel_table_clear extends Command
 
     public function handle(): int
     {
-        $database_connections_ = $this->list_items_resolve_((string) $this->option('database'));
-        $table_names_ = $this->table_names_resolve_((int) $this->option('all'));
-        $clear_targets_ = $this->clear_targets_resolve_($database_connections_);
+        $database_connections_ = $this->List_Items_Resolve((string) $this->option('database'));
+        $table_names_ = $this->Table_Names_Resolve((int) $this->option('all'));
+        $clear_targets_ = $this->Clear_Targets_Resolve($database_connections_);
 
         if ($table_names_ === null || $clear_targets_ === null) {
             return self::FAILURE;
@@ -58,18 +58,18 @@ class hahaha_command_laravel_table_clear extends Command
 
         foreach ($clear_targets_ as $clear_target_) {
             if ($clear_target_['mode'] === 'redis_connection') {
-                $is_flushed_ = $this->redis_connection_flush_($clear_target_['name']);
+                $is_flushed_ = $this->Redis_Connection_Flush($clear_target_['name']);
 
                 if (! $is_flushed_) {
                     return self::FAILURE;
                 }
 
-                $this->components->info('Flushed '.$this->clear_target_label_resolve_($clear_target_).'.');
+                $this->components->info('Flushed '.$this->Clear_Target_Label_Resolve($clear_target_).'.');
 
                 continue;
             }
 
-            $deleted_records_count_ = $this->database_tables_clear_($table_names_, $clear_target_['name']);
+            $deleted_records_count_ = $this->Database_Tables_Clear($table_names_, $clear_target_['name']);
 
             if ($deleted_records_count_ === null) {
                 return self::FAILURE;
@@ -79,7 +79,7 @@ class hahaha_command_laravel_table_clear extends Command
                 'Deleted '
                 .$deleted_records_count_
                 .' records from '
-                .$this->clear_target_label_resolve_($clear_target_)
+                .$this->Clear_Target_Label_Resolve($clear_target_)
                 .'.'
             );
         }
@@ -90,9 +90,9 @@ class hahaha_command_laravel_table_clear extends Command
     /**
      * @return array<int, string>|null
      */
-    private function table_names_resolve_(int $table_group_key_): ?array
+    public function Table_Names_Resolve(int $table_group_key): ?array
     {
-        if ($table_group_key_ === 1) {
+        if ($table_group_key === 1) {
             $table_names_ = [];
 
             foreach ($this->table_groups_ as $table_group_) {
@@ -118,15 +118,15 @@ class hahaha_command_laravel_table_clear extends Command
             return $table_names_;
         }
 
-        if (! array_key_exists($table_group_key_, $this->table_groups_)) {
-            $this->components->error('Unsupported table group key: '.$table_group_key_);
+        if (! array_key_exists($table_group_key, $this->table_groups_)) {
+            $this->components->error('Unsupported table group key: '.$table_group_key);
 
             return null;
         }
 
         $table_names_ = [];
 
-        foreach ($this->table_groups_[$table_group_key_] as $table_name_) {
+        foreach ($this->table_groups_[$table_group_key] as $table_name_) {
             $resolved_table_name_ = trim((string) $table_name_);
 
             if ($resolved_table_name_ === '') {
@@ -139,7 +139,7 @@ class hahaha_command_laravel_table_clear extends Command
         $table_names_ = array_values(array_unique($table_names_));
 
         if ($table_names_ === []) {
-            $this->components->error('No table names were configured for table group key: '.$table_group_key_);
+            $this->components->error('No table names were configured for table group key: '.$table_group_key);
 
             return null;
         }
@@ -151,7 +151,7 @@ class hahaha_command_laravel_table_clear extends Command
      * @param  array<int, string>  $database_connections_
      * @return array<int, array{mode: string, name: string}>|null
      */
-    private function clear_targets_resolve_(array $database_connections_): ?array
+    public function Clear_Targets_Resolve(array $database_connections_): ?array
     {
         if ($database_connections_ === []) {
             return [[
@@ -192,7 +192,7 @@ class hahaha_command_laravel_table_clear extends Command
     /**
      * @param  array<int, string>  $table_names_
      */
-    private function database_tables_clear_(array $table_names_, string $database_connection_): ?int
+    public function Database_Tables_Clear(array $table_names_, string $database_connection_): ?int
     {
         foreach ($table_names_ as $table_name_) {
             if (! Schema::connection($database_connection_)->hasTable($table_name_)) {
@@ -221,7 +221,7 @@ class hahaha_command_laravel_table_clear extends Command
         return $deleted_records_count_;
     }
 
-    private function redis_connection_flush_(string $redis_connection_): bool
+    public function Redis_Connection_Flush(string $redis_connection_): bool
     {
         return (bool) Redis::connection($redis_connection_)->flushdb();
     }
@@ -229,7 +229,7 @@ class hahaha_command_laravel_table_clear extends Command
     /**
      * @param  array{mode: string, name: string}  $clear_target_
      */
-    private function clear_target_label_resolve_(array $clear_target_): string
+    public function Clear_Target_Label_Resolve(array $clear_target_): string
     {
         if ($clear_target_['mode'] === 'redis_connection') {
             return 'redis connection ['.$clear_target_['name'].']';
@@ -241,7 +241,7 @@ class hahaha_command_laravel_table_clear extends Command
     /**
      * @return array<int, string>
      */
-    private function list_items_resolve_(string $list_input_): array
+    public function List_Items_Resolve(string $list_input_): array
     {
         $trimmed_input_ = trim($list_input_);
 

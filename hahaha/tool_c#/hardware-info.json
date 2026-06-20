@@ -1,0 +1,26 @@
+{
+  "UpdatedAt": "2026-06-20T23:16:32.6829577+08:00",
+  "TotalCpuUsagePercent": 11.257046,
+  "CoreUsages": [
+    {
+      "CoreName": "0",
+      "UsagePercent": 13.006459
+    },
+    {
+      "CoreName": "1",
+      "UsagePercent": 11.546193
+    },
+    {
+      "CoreName": "3",
+      "UsagePercent": 11.0110235
+    },
+    {
+      "CoreName": "2",
+      "UsagePercent": 9.3412285
+    }
+  ],
+  "UsedMemoryBytes": 15052025856,
+  "TotalMemoryBytes": 34274267136,
+  "UsedDiskBytes": 722006052864,
+  "TotalDiskBytes": 3753136062464
+}

@@ -25,8 +25,8 @@ class hahaha_command_laravel_seed extends Command
 
     public function handle(): int
     {
-        $database_connections_ = $this->list_items_resolve_((string) $this->option('database'));
-        $seeder_classes_ = $this->seeder_classes_resolve_();
+        $database_connections_ = $this->List_Items_Resolve((string) $this->option('database'));
+        $seeder_classes_ = $this->Seeder_Classes_Resolve();
 
         if ($seeder_classes_ === null) {
             return self::FAILURE;
@@ -39,13 +39,13 @@ class hahaha_command_laravel_seed extends Command
         }
 
         if ($database_connections_ === []) {
-            $exit_code_ = $this->seeders_run_($seeder_classes_, null);
+            $exit_code_ = $this->Seeders_Run($seeder_classes_, null);
 
             return $exit_code_ === self::SUCCESS ? self::SUCCESS : self::FAILURE;
         }
 
         foreach ($database_connections_ as $database_connection_) {
-            $exit_code_ = $this->seeders_run_($seeder_classes_, $database_connection_);
+            $exit_code_ = $this->Seeders_Run($seeder_classes_, $database_connection_);
 
             if ($exit_code_ !== self::SUCCESS) {
                 return $exit_code_;
@@ -58,13 +58,13 @@ class hahaha_command_laravel_seed extends Command
     /**
      * @return array<int, string>|null
      */
-    private function seeder_classes_resolve_(): ?array
+    public function Seeder_Classes_Resolve(): ?array
     {
-        $seeder_files_ = $this->seeder_files_resolve_();
+        $seeder_files_ = $this->Seeder_Files_Resolve();
         $seeder_classes_ = [];
 
         foreach ($seeder_files_ as $seeder_file_) {
-            $seeder_class_ = $this->seeder_class_name_resolve_($seeder_file_);
+            $seeder_class_ = $this->Seeder_Class_Name_Resolve($seeder_file_);
 
             if ($seeder_class_ === null) {
                 $this->components->error('Unable to resolve seeder class from file: '.$seeder_file_);
@@ -89,7 +89,7 @@ class hahaha_command_laravel_seed extends Command
     /**
      * @return array<int, string>
      */
-    private function seeder_files_resolve_(): array
+    public function Seeder_Files_Resolve(): array
     {
         $resolved_seeder_files_ = [];
 
@@ -126,7 +126,7 @@ class hahaha_command_laravel_seed extends Command
         return array_values(array_unique($resolved_seeder_files_));
     }
 
-    private function seeder_class_name_resolve_(string $seeder_file_): ?string
+    public function Seeder_Class_Name_Resolve(string $seeder_file_): ?string
     {
         $seeder_file_content_ = File::get($seeder_file_);
         $namespace_name_ = null;
@@ -154,7 +154,7 @@ class hahaha_command_laravel_seed extends Command
     /**
      * @param  array<int, string>  $seeder_classes_
      */
-    private function seeders_run_(array $seeder_classes_, ?string $database_connection_): int
+    public function Seeders_Run(array $seeder_classes_, ?string $database_connection_): int
     {
         foreach ($seeder_classes_ as $seeder_class_) {
             $seed_command_options_ = [
@@ -178,7 +178,7 @@ class hahaha_command_laravel_seed extends Command
     /**
      * @return array<int, string>
      */
-    private function list_items_resolve_(string $list_input_): array
+    public function List_Items_Resolve(string $list_input_): array
     {
         $trimmed_input_ = trim($list_input_);
 
@@ -202,7 +202,7 @@ class hahaha_command_laravel_seed extends Command
         return $resolved_entries_;
     }
 
-    private function path_is_absolute_(string $path_input_): bool
+    public function Path_Is_Absolute(string $path_input_): bool
     {
         if ($path_input_ === '') {
             return false;
@@ -216,7 +216,7 @@ class hahaha_command_laravel_seed extends Command
             || str_starts_with($path_input_, '\\');
     }
 
-    private function path_absolute_resolve_(string $path_input_): string
+    public function Path_Absolute_Resolve(string $path_input_): string
     {
         if ($this->Path_Is_Absolute($path_input_)) {
             return $path_input_;

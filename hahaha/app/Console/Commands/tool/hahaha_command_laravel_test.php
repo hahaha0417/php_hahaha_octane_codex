@@ -38,9 +38,9 @@ class hahaha_command_laravel_test extends Command
      */
     public function handle(): int
     {
-        $test_targets_ = $this->test_targets_resolve_();
-        $is_parallel_ = $this->parallel_option_resolve_();
-        $processes_ = $this->processes_option_resolve_();
+        $test_targets_ = $this->Test_Targets_Resolve();
+        $is_parallel_ = $this->Parallel_Option_Resolve();
+        $processes_ = $this->Processes_Option_Resolve();
 
         if ($test_targets_ === []) {
             $this->components->error('No test targets were resolved from the configured test paths.');
@@ -48,7 +48,7 @@ class hahaha_command_laravel_test extends Command
             return self::FAILURE;
         }
 
-        if ($is_parallel_ && ! $this->paratest_is_available_()) {
+        if ($is_parallel_ && ! $this->Paratest_Is_Available()) {
             $this->components->warn(
                 'Parallel testing requires brianium/paratest. Falling back to sequential PHPUnit execution.'
             );
@@ -61,7 +61,7 @@ class hahaha_command_laravel_test extends Command
         foreach ($test_targets_ as $test_target_) {
             $process_result_ = Process::path(base_path())
                 ->forever()
-                ->run($this->test_command_resolve_($test_target_, $is_parallel_, $processes_), function (string $type_, string $output_): void {
+                ->run($this->Test_Command_Resolve($test_target_, $is_parallel_, $processes_), function (string $type_, string $output_): void {
                     $this->output->write($output_);
                 });
 
@@ -78,7 +78,7 @@ class hahaha_command_laravel_test extends Command
     /**
      * @return array<int, string>
      */
-    private function test_targets_resolve_(): array
+    public function Test_Targets_Resolve(): array
     {
         $test_targets_ = [];
 
@@ -92,7 +92,7 @@ class hahaha_command_laravel_test extends Command
             $absolute_test_path_ = $this->Path_Absolute_Resolve($resolved_test_path_);
 
             if (File::isFile($absolute_test_path_)) {
-                if (! $this->test_file_name_is_supported_(basename($absolute_test_path_))) {
+                if (! $this->Test_File_Name_Is_Supported(basename($absolute_test_path_))) {
                     continue;
                 }
 
@@ -107,7 +107,7 @@ class hahaha_command_laravel_test extends Command
                 continue;
             }
 
-            if ($this->directory_includes_supported_tests_($absolute_test_path_)) {
+            if ($this->Directory_Includes_Supported_Tests($absolute_test_path_)) {
                 $test_targets_[] = $absolute_test_path_;
             }
         }
@@ -115,13 +115,13 @@ class hahaha_command_laravel_test extends Command
         $test_targets_ = array_values(array_unique($test_targets_));
         sort($test_targets_);
 
-        return $this->redundant_nested_targets_remove_($test_targets_);
+        return $this->Redundant_Nested_Targets_Remove($test_targets_);
     }
 
     /**
      * @return array<int, string>
      */
-    private function test_command_resolve_(string $test_target_, bool $is_parallel_, int $processes_): array
+    public function Test_Command_Resolve(string $test_target_, bool $is_parallel_, int $processes): array
     {
         $test_command_ = [
             PHP_BINARY,
@@ -133,8 +133,8 @@ class hahaha_command_laravel_test extends Command
         if ($is_parallel_) {
             $test_command_[] = '--parallel';
 
-            if ($processes_ > 0) {
-                $test_command_[] = '--processes='.$processes_;
+            if ($processes > 0) {
+                $test_command_[] = '--processes='.$processes;
             }
         }
 
@@ -144,7 +144,7 @@ class hahaha_command_laravel_test extends Command
         ];
     }
 
-    private function parallel_option_resolve_(): bool
+    public function Parallel_Option_Resolve(): bool
     {
         if ((bool) $this->option('parallel')) {
             return true;
@@ -153,7 +153,7 @@ class hahaha_command_laravel_test extends Command
         return $this->is_parallel_;
     }
 
-    private function processes_option_resolve_(): int
+    public function Processes_Option_Resolve(): int
     {
         $processes_option_ = trim((string) $this->option('processes'));
 
@@ -170,7 +170,7 @@ class hahaha_command_laravel_test extends Command
         return (int) $processes_option_;
     }
 
-    private function paratest_is_available_(): bool
+    public function Paratest_Is_Available(): bool
     {
         if (is_bool($this->has_paratest_)) {
             return $this->has_paratest_;
@@ -179,16 +179,16 @@ class hahaha_command_laravel_test extends Command
         return class_exists(WrapperRunner::class);
     }
 
-    private function test_file_name_is_supported_(string $test_file_name_): bool
+    public function Test_File_Name_Is_Supported(string $test_file_name_): bool
     {
         return Str::endsWith($test_file_name_, 'Test.php')
             || Str::endsWith($test_file_name_, '_test.php');
     }
 
-    private function directory_includes_supported_tests_(string $directory_path_): bool
+    public function Directory_Includes_Supported_Tests(string $directory_path_): bool
     {
         foreach (File::allFiles($directory_path_) as $test_file_) {
-            if ($this->test_file_name_is_supported_($test_file_->getFilename())) {
+            if ($this->Test_File_Name_Is_Supported($test_file_->getFilename())) {
                 return true;
             }
         }
@@ -200,7 +200,7 @@ class hahaha_command_laravel_test extends Command
      * @param  array<int, string>  $test_targets_
      * @return array<int, string>
      */
-    private function redundant_nested_targets_remove_(array $test_targets_): array
+    public function Redundant_Nested_Targets_Remove(array $test_targets_): array
     {
         $resolved_targets_ = [];
 
@@ -233,7 +233,7 @@ class hahaha_command_laravel_test extends Command
         return $resolved_targets_;
     }
 
-    private function path_is_absolute_(string $path_input_): bool
+    public function Path_Is_Absolute(string $path_input_): bool
     {
         if ($path_input_ === '') {
             return false;
@@ -247,7 +247,7 @@ class hahaha_command_laravel_test extends Command
             || str_starts_with($path_input_, '\\');
     }
 
-    private function path_absolute_resolve_(string $path_input_): string
+    public function Path_Absolute_Resolve(string $path_input_): string
     {
         if ($this->Path_Is_Absolute($path_input_)) {
             return $path_input_;

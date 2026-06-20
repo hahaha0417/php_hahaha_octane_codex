@@ -39,18 +39,18 @@ class hahaha_command_laravel_queue_clear extends Command
 
     public function handle(): int
     {
-        $database_targets_ = $this->list_items_resolve_((string) $this->option('database'));
-        $connection_types_ = $this->connection_types_resolve_((string) $this->option('connection'));
+        $database_targets_ = $this->List_Items_Resolve((string) $this->option('database'));
+        $connection_types_ = $this->Connection_Types_Resolve((string) $this->option('connection'));
         $queue_group_key_ = (int) $this->option('all');
-        $queue_names_ = $this->queue_names_resolve_($queue_group_key_);
-        $clear_targets_ = $this->clear_targets_resolve_($connection_types_, $database_targets_);
+        $queue_names_ = $this->Queue_Names_Resolve($queue_group_key_);
+        $clear_targets_ = $this->Clear_Targets_Resolve($connection_types_, $database_targets_);
 
         if ($queue_names_ === null || $connection_types_ === null || $clear_targets_ === null) {
             return self::FAILURE;
         }
 
         foreach ($clear_targets_ as $clear_target_) {
-            $deleted_jobs_count_ = $this->queue_jobs_clear_($queue_names_, $clear_target_);
+            $deleted_jobs_count_ = $this->Queue_Jobs_Clear($queue_names_, $clear_target_);
 
             if ($deleted_jobs_count_ === null) {
                 return self::FAILURE;
@@ -60,7 +60,7 @@ class hahaha_command_laravel_queue_clear extends Command
                 'Deleted '
                 .$deleted_jobs_count_
                 .' queue jobs from '
-                .$this->clear_target_label_resolve_($clear_target_)
+                .$this->Clear_Target_Label_Resolve($clear_target_)
                 .'.'
             );
         }
@@ -71,9 +71,9 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @return array<int, string>|null
      */
-    private function queue_names_resolve_(int $queue_group_key_): ?array
+    public function Queue_Names_Resolve(int $queue_group_key): ?array
     {
-        if ($queue_group_key_ === 1) {
+        if ($queue_group_key === 1) {
             $queue_names_ = [];
 
             foreach ($this->queue_groups_ as $queue_group_) {
@@ -99,15 +99,15 @@ class hahaha_command_laravel_queue_clear extends Command
             return $queue_names_;
         }
 
-        if (! array_key_exists($queue_group_key_, $this->queue_groups_)) {
-            $this->components->error('Unsupported queue group key: '.$queue_group_key_);
+        if (! array_key_exists($queue_group_key, $this->queue_groups_)) {
+            $this->components->error('Unsupported queue group key: '.$queue_group_key);
 
             return null;
         }
 
         $queue_names_ = [];
 
-        foreach ($this->queue_groups_[$queue_group_key_] as $queue_name_) {
+        foreach ($this->queue_groups_[$queue_group_key] as $queue_name_) {
             $resolved_queue_name_ = trim((string) $queue_name_);
 
             if ($resolved_queue_name_ === '') {
@@ -120,7 +120,7 @@ class hahaha_command_laravel_queue_clear extends Command
         $queue_names_ = array_values(array_unique($queue_names_));
 
         if ($queue_names_ === []) {
-            $this->components->error('No queue names were configured for queue group key: '.$queue_group_key_);
+            $this->components->error('No queue names were configured for queue group key: '.$queue_group_key);
 
             return null;
         }
@@ -131,9 +131,9 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @return array<int, string>|null
      */
-    private function connection_types_resolve_(string $connection_input_): ?array
+    public function Connection_Types_Resolve(string $connection_input_): ?array
     {
-        $connection_types_ = $this->list_items_resolve_($connection_input_);
+        $connection_types_ = $this->List_Items_Resolve($connection_input_);
 
         if ($connection_types_ === []) {
             return [(string) config('queue.default')];
@@ -161,7 +161,7 @@ class hahaha_command_laravel_queue_clear extends Command
      * @param  array<int, string>  $database_targets_
      * @return array<int, array{mode: string, name: string}>|null
      */
-    private function clear_targets_resolve_(array $connection_types_, array $database_targets_): ?array
+    public function Clear_Targets_Resolve(array $connection_types_, array $database_targets_): ?array
     {
         $clear_targets_ = [];
 
@@ -219,23 +219,23 @@ class hahaha_command_laravel_queue_clear extends Command
      * @param  array<int, string>  $queue_names_
      * @param  array{mode: string, name: string}  $clear_target_
      */
-    private function queue_jobs_clear_(array $queue_names_, array $clear_target_): ?int
+    public function Queue_Jobs_Clear(array $queue_names_, array $clear_target_): ?int
     {
         if ($clear_target_['mode'] === 'database_connection') {
-            return $this->database_queue_jobs_clear_($queue_names_, $clear_target_['name']);
+            return $this->Database_Queue_Jobs_Clear($queue_names_, $clear_target_['name']);
         }
 
         if ($clear_target_['mode'] === 'redis_connection') {
-            return $this->redis_queue_jobs_clear_($queue_names_, $clear_target_['name']);
+            return $this->Redis_Queue_Jobs_Clear($queue_names_, $clear_target_['name']);
         }
 
-        return $this->redis_queue_jobs_clear_by_database_number_($queue_names_, $clear_target_['name']);
+        return $this->Redis_Queue_Jobs_Clear_By_Database_Number($queue_names_, $clear_target_['name']);
     }
 
     /**
      * @param  array<int, string>  $queue_names_
      */
-    private function database_queue_jobs_clear_(array $queue_names_, ?string $database_connection_): int
+    public function Database_Queue_Jobs_Clear(array $queue_names_, ?string $database_connection_): int
     {
         $jobs_query_ = DB::connection($database_connection_)
             ->table(HahahaTable::JOBS->value)
@@ -247,9 +247,9 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @param  array<int, string>  $queue_names_
      */
-    private function redis_queue_jobs_clear_(array $queue_names_, string $redis_connection_name_): ?int
+    public function Redis_Queue_Jobs_Clear(array $queue_names_, string $redis_connection_name_): ?int
     {
-        return $this->queue_connection_jobs_clear_with_config_([
+        return $this->Queue_Connection_Jobs_Clear_With_Config([
             ...config('queue.connections.redis', []),
             'connection' => $redis_connection_name_,
         ], 'redis['.$redis_connection_name_.']', $queue_names_);
@@ -258,7 +258,7 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @param  array<int, string>  $queue_names_
      */
-    private function redis_queue_jobs_clear_by_database_number_(array $queue_names_, string $redis_database_number_): ?int
+    public function Redis_Queue_Jobs_Clear_By_Database_Number(array $queue_names_, string $redis_database_number_): ?int
     {
         $base_redis_connection_name_ = (string) config('queue.connections.redis.connection', 'default');
         $base_redis_connection_config_ = config('database.redis.'.$base_redis_connection_name_);
@@ -279,7 +279,7 @@ class hahaha_command_laravel_queue_clear extends Command
             ],
         ]);
 
-        return $this->queue_connection_jobs_clear_with_config_([
+        return $this->Queue_Connection_Jobs_Clear_With_Config([
             ...config('queue.connections.redis', []),
             'connection' => $temporary_redis_connection_name_,
         ], $temporary_queue_connection_label_, $queue_names_);
@@ -289,7 +289,7 @@ class hahaha_command_laravel_queue_clear extends Command
      * @param  array<string, mixed>  $queue_connection_config_
      * @param  array<int, string>  $queue_names_
      */
-    private function queue_connection_jobs_clear_with_config_(
+    public function Queue_Connection_Jobs_Clear_With_Config(
         array $queue_connection_config_,
         string $queue_connection_label_,
         array $queue_names_
@@ -322,7 +322,7 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @param  array<int, string>  $queue_names_
      */
-    private function database_queue_connection_jobs_clear_(
+    public function Database_Queue_Connection_Jobs_Clear(
         array $queue_names_,
         ?string $database_connection_name_,
         string $jobs_table_name_
@@ -336,7 +336,7 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @param  array{mode: string, name: string}  $clear_target_
      */
-    private function clear_target_label_resolve_(array $clear_target_): string
+    public function Clear_Target_Label_Resolve(array $clear_target_): string
     {
         if ($clear_target_['mode'] === 'database_connection') {
             return 'database connection ['.$clear_target_['name'].']';
@@ -352,7 +352,7 @@ class hahaha_command_laravel_queue_clear extends Command
     /**
      * @return array<int, string>
      */
-    private function list_items_resolve_(string $list_input_): array
+    public function List_Items_Resolve(string $list_input_): array
     {
         $trimmed_input_ = trim($list_input_);
 

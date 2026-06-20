@@ -1,0 +1,7 @@
+{
+  "JsonOutputPath": "..\\..\\tool_c#\\hardware-info.json",
+  "WriteIntervalMs": 250,
+  "UiUpdateIntervalMs": 5000,
+  "InternalSamplingIntervalMs": 250,
+  "CpuSmoothingWindowSize": 3
+}

@@ -30,9 +30,9 @@ class hahaha_command_laravel_migrate extends Command
 
     public function handle(): int
     {
-        $migrate_command_ = $this->migrate_command_resolve_();
-        $migrate_paths_ = $this->migrate_paths_resolve_();
-        $database_connections_ = $this->list_items_resolve_((string) $this->option('database'));
+        $migrate_command_ = $this->Migrate_Command_Resolve();
+        $migrate_paths_ = $this->Migrate_Paths_Resolve();
+        $database_connections_ = $this->List_Items_Resolve((string) $this->option('database'));
         $migrate_jobs_ = [];
 
         if ($database_connections_ === []) {
@@ -51,7 +51,7 @@ class hahaha_command_laravel_migrate extends Command
 
         foreach ($migrate_jobs_ as $migrate_job_) {
             if (in_array($migrate_command_, ['migrations:log', 'migrations:delete'], true)) {
-                $exit_code_ = $this->migrations_repository_update_(
+                $exit_code_ = $this->Migrations_Repository_Update(
                     $migrate_command_,
                     $migrate_job_['migrate'],
                     is_string($migrate_job_['db']) ? $migrate_job_['db'] : null
@@ -70,7 +70,7 @@ class hahaha_command_laravel_migrate extends Command
                 $migrate_command_options_['--path'] = $migrate_job_['migrate'];
             }
 
-            if ($this->list_items_include_absolute_path_($migrate_job_['migrate'])) {
+            if ($this->List_Items_Include_Absolute_Path($migrate_job_['migrate'])) {
                 $migrate_command_options_['--realpath'] = true;
             }
 
@@ -88,7 +88,7 @@ class hahaha_command_laravel_migrate extends Command
         return self::SUCCESS;
     }
 
-    private function migrate_command_resolve_(): string
+    public function Migrate_Command_Resolve(): string
     {
         $migrate_command_ = trim($this->migrate_command_);
 
@@ -110,7 +110,7 @@ class hahaha_command_laravel_migrate extends Command
     /**
      * @return array<int, string>
      */
-    private function migrate_paths_resolve_(): array
+    public function Migrate_Paths_Resolve(): array
     {
         $migrate_paths_ = [];
 
@@ -130,12 +130,12 @@ class hahaha_command_laravel_migrate extends Command
     /**
      * @param  array<int, string>  $migrate_paths_
      */
-    private function migrations_repository_update_(
+    public function Migrations_Repository_Update(
         string $migrate_command_,
         array $migrate_paths_,
         ?string $database_connection_
     ): int {
-        $migration_names_ = $this->migration_names_resolve_($migrate_paths_);
+        $migration_names_ = $this->Migration_Names_Resolve($migrate_paths_);
         $migrator_ = app('migrator');
         $repository_ = $migrator_->getRepository();
 
@@ -175,12 +175,12 @@ class hahaha_command_laravel_migrate extends Command
      * @param  array<int, string>  $migrate_paths_
      * @return array<int, string>
      */
-    private function migration_names_resolve_(array $migrate_paths_): array
+    public function Migration_Names_Resolve(array $migrate_paths_): array
     {
         $migration_names_ = [];
 
         foreach ($migrate_paths_ as $migrate_path_) {
-            $resolved_migrate_path_ = $this->migrate_path_absolute_resolve_($migrate_path_);
+            $resolved_migrate_path_ = $this->Migrate_Path_Absolute_Resolve($migrate_path_);
 
             if (File::isFile($resolved_migrate_path_)) {
                 $migration_names_[] = pathinfo($resolved_migrate_path_, PATHINFO_FILENAME);
@@ -203,7 +203,7 @@ class hahaha_command_laravel_migrate extends Command
     /**
      * @return array<int, string>
      */
-    private function list_items_resolve_(string $list_input_): array
+    public function List_Items_Resolve(string $list_input_): array
     {
         $trimmed_input_ = trim($list_input_);
 
@@ -230,7 +230,7 @@ class hahaha_command_laravel_migrate extends Command
     /**
      * @param  array<int, string>  $paths_
      */
-    private function list_items_include_absolute_path_(array $paths_): bool
+    public function List_Items_Include_Absolute_Path(array $paths_): bool
     {
         foreach ($paths_ as $path_) {
             if ($this->Path_Is_Absolute($path_)) {
@@ -241,7 +241,7 @@ class hahaha_command_laravel_migrate extends Command
         return false;
     }
 
-    private function path_is_absolute_(string $path_input_): bool
+    public function Path_Is_Absolute(string $path_input_): bool
     {
         if ($path_input_ === '') {
             return false;
@@ -255,7 +255,7 @@ class hahaha_command_laravel_migrate extends Command
             || str_starts_with($path_input_, '\\');
     }
 
-    private function migrate_path_absolute_resolve_(string $migrate_path_): string
+    public function Migrate_Path_Absolute_Resolve(string $migrate_path_): string
     {
         if ($this->Path_Is_Absolute($migrate_path_)) {
             return $migrate_path_;

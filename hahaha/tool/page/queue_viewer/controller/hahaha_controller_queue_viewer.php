@@ -25,9 +25,9 @@ class hahaha_controller_queue_viewer extends Controller
                 (string) $request->query('connection', ''),
                 (string) $request->query('db', ''),
                 (string) $request->query('tab', 'setting'),
-                $this->request_queue_list_resolve_($request)
+                $this->Request_Queue_List_Resolve($request)
             );
-        $queue_snapshot_ = $this->queue_snapshot_resolve_($page_config_, $request);
+        $queue_snapshot_ = $this->Queue_Snapshot_Resolve($page_config_, $request);
 
         return View::file(base_path('tool/page/queue_viewer/view/hahaha_view_queue_viewer.blade.php'), [
             'page_config_' => $page_config_,
@@ -39,11 +39,11 @@ class hahaha_controller_queue_viewer extends Controller
 
     public function Queue_Delete(Request $request, string $job_id): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'queue');
-        $queue_action_context_ = $this->database_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'queue');
+        $queue_action_context_ = $this->Database_Queue_Action_Context_Resolve($page_config_);
 
         if ($queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'queue_page' => (int) $request->input('queue_page', 1),
             ])->with('queue_viewer_error_', $queue_action_context_['message']);
         }
@@ -54,19 +54,19 @@ class hahaha_controller_queue_viewer extends Controller
             ->delete();
 
         if ($deleted_rows_count_ === 0) {
-            return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_error_', '刪除失敗：找不到指定的 queue job。');
+            return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_error_', '刪除失敗：找不到指定的 queue job。');
         }
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', 'Queue job 已刪除。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', 'Queue job 已刪除。');
     }
 
     public function Queue_Bulk_Delete(Request $request): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'queue');
-        $queue_action_context_ = $this->database_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'queue');
+        $queue_action_context_ = $this->Database_Queue_Action_Context_Resolve($page_config_);
 
         if ($queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'queue_page' => (int) $request->input('queue_page', 1),
             ])->with('queue_viewer_error_', $queue_action_context_['message']);
         }
@@ -85,22 +85,22 @@ class hahaha_controller_queue_viewer extends Controller
             ->whereIn(HahahaJobsColumn::ID->value, $selected_job_ids_)
             ->delete();
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', '已刪除 '.$deleted_rows_count_.' 筆 queue jobs。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', '已刪除 '.$deleted_rows_count_.' 筆 queue jobs。');
     }
 
     public function Queue_Clear_Selected(Request $request): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'queue');
-        $queue_action_context_ = $this->database_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'queue');
+        $queue_action_context_ = $this->Database_Queue_Action_Context_Resolve($page_config_);
 
         if ($queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'queue_page' => (int) $request->input('queue_page', 1),
             ])->with('queue_viewer_error_', $queue_action_context_['message']);
         }
 
         if ($page_config_->Selected_Queue_List_ === []) {
-            return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_error_', '請先指定至少一個 queue，再清空 jobs。');
+            return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_error_', '請先指定至少一個 queue，再清空 jobs。');
         }
 
         $deleted_rows_count_ = DB::connection($page_config_->Selected_Database_)
@@ -108,16 +108,16 @@ class hahaha_controller_queue_viewer extends Controller
             ->whereIn(HahahaJobsColumn::QUEUE->value, $page_config_->Selected_Queue_List_)
             ->delete();
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', '已清空指定 queue 的 '.$deleted_rows_count_.' 筆 jobs。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', '已清空指定 queue 的 '.$deleted_rows_count_.' 筆 jobs。');
     }
 
     public function Queue_Clear_All(Request $request): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'queue');
-        $queue_action_context_ = $this->database_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'queue');
+        $queue_action_context_ = $this->Database_Queue_Action_Context_Resolve($page_config_);
 
         if ($queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'queue_page' => (int) $request->input('queue_page', 1),
             ])->with('queue_viewer_error_', $queue_action_context_['message']);
         }
@@ -126,16 +126,16 @@ class hahaha_controller_queue_viewer extends Controller
             ->table($queue_action_context_['jobs_table_name'])
             ->delete();
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', '已清空全部 queue 的 '.$deleted_rows_count_.' 筆 jobs。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', '已清空全部 queue 的 '.$deleted_rows_count_.' 筆 jobs。');
     }
 
     public function Fail_Queue_Delete(Request $request, string $job_id): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'fail_queue');
-        $failed_queue_action_context_ = $this->database_failed_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'fail_queue');
+        $failed_queue_action_context_ = $this->Database_Failed_Queue_Action_Context_Resolve($page_config_);
 
         if ($failed_queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'fail_queue_page' => (int) $request->input('fail_queue_page', 1),
             ])->with('queue_viewer_error_', $failed_queue_action_context_['message']);
         }
@@ -146,19 +146,19 @@ class hahaha_controller_queue_viewer extends Controller
             ->delete();
 
         if ($deleted_rows_count_ === 0) {
-            return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_error_', '刪除失敗：找不到指定的 failed queue job。');
+            return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_error_', '刪除失敗：找不到指定的 failed queue job。');
         }
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', 'Failed queue job 已刪除。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', 'Failed queue job 已刪除。');
     }
 
     public function Fail_Queue_Bulk_Delete(Request $request): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'fail_queue');
-        $failed_queue_action_context_ = $this->database_failed_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'fail_queue');
+        $failed_queue_action_context_ = $this->Database_Failed_Queue_Action_Context_Resolve($page_config_);
 
         if ($failed_queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'fail_queue_page' => (int) $request->input('fail_queue_page', 1),
             ])->with('queue_viewer_error_', $failed_queue_action_context_['message']);
         }
@@ -177,22 +177,22 @@ class hahaha_controller_queue_viewer extends Controller
             ->whereIn(HahahaFailedJobsColumn::ID->value, $selected_failed_job_ids_)
             ->delete();
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', '已刪除 '.$deleted_rows_count_.' 筆 failed queue jobs。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', '已刪除 '.$deleted_rows_count_.' 筆 failed queue jobs。');
     }
 
     public function Fail_Queue_Clear_Selected(Request $request): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'fail_queue');
-        $failed_queue_action_context_ = $this->database_failed_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'fail_queue');
+        $failed_queue_action_context_ = $this->Database_Failed_Queue_Action_Context_Resolve($page_config_);
 
         if ($failed_queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'fail_queue_page' => (int) $request->input('fail_queue_page', 1),
             ])->with('queue_viewer_error_', $failed_queue_action_context_['message']);
         }
 
         if ($page_config_->Selected_Queue_List_ === []) {
-            return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_error_', '請先指定至少一個 queue，再清空 failed jobs。');
+            return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_error_', '請先指定至少一個 queue，再清空 failed jobs。');
         }
 
         $deleted_rows_count_ = DB::connection($page_config_->Selected_Database_)
@@ -200,16 +200,16 @@ class hahaha_controller_queue_viewer extends Controller
             ->whereIn(HahahaFailedJobsColumn::QUEUE->value, $page_config_->Selected_Queue_List_)
             ->delete();
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', '已清空指定 queue 的 '.$deleted_rows_count_.' 筆 failed jobs。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', '已清空指定 queue 的 '.$deleted_rows_count_.' 筆 failed jobs。');
     }
 
     public function Fail_Queue_Clear_All(Request $request): RedirectResponse
     {
-        $page_config_ = $this->page_config_from_request_resolve_($request, 'fail_queue');
-        $failed_queue_action_context_ = $this->database_failed_queue_action_context_resolve_($page_config_);
+        $page_config_ = $this->Page_Config_From_Request_Resolve($request, 'fail_queue');
+        $failed_queue_action_context_ = $this->Database_Failed_Queue_Action_Context_Resolve($page_config_);
 
         if ($failed_queue_action_context_['is_supported'] === false) {
-            return $this->queue_redirect_response_resolve_($page_config_, [
+            return $this->Queue_Redirect_Response_Resolve($page_config_, [
                 'fail_queue_page' => (int) $request->input('fail_queue_page', 1),
             ])->with('queue_viewer_error_', $failed_queue_action_context_['message']);
         }
@@ -218,19 +218,19 @@ class hahaha_controller_queue_viewer extends Controller
             ->table($failed_queue_action_context_['failed_jobs_table_name'])
             ->delete();
 
-        return $this->queue_redirect_response_resolve_($page_config_)->with('queue_viewer_status_', '已清空全部 failed queue 的 '.$deleted_rows_count_.' 筆 jobs。');
+        return $this->Queue_Redirect_Response_Resolve($page_config_)->with('queue_viewer_status_', '已清空全部 failed queue 的 '.$deleted_rows_count_.' 筆 jobs。');
     }
 
-    private function queue_snapshot_resolve_(hahaha_config_queue_viewer $page_config_, Request $request): array
+    public function Queue_Snapshot_Resolve(hahaha_config_queue_viewer $page_config_, Request $request): array
     {
         if ($page_config_->Selected_Connection_ === 'redis') {
-            return $this->redis_snapshot_resolve_($page_config_, $request);
+            return $this->Redis_Snapshot_Resolve($page_config_, $request);
         }
 
-        return $this->database_snapshot_resolve_($page_config_, $request);
+        return $this->Database_Snapshot_Resolve($page_config_, $request);
     }
 
-    private function database_snapshot_resolve_(hahaha_config_queue_viewer $page_config_, Request $request): array
+    public function Database_Snapshot_Resolve(hahaha_config_queue_viewer $page_config_, Request $request): array
     {
         $database_connection_name_ = $page_config_->Selected_Database_;
         $jobs_table_name_ = HahahaTable::JOBS->value;
@@ -297,7 +297,7 @@ class hahaha_controller_queue_viewer extends Controller
                         return [
                             'id' => (string) $job_row_->id,
                             'queue' => (string) $job_row_->queue,
-                            'display_name' => $this->payload_display_name_resolve_($payload_),
+                            'display_name' => $this->Payload_Display_Name_Resolve($payload_),
                             'payload' => $payload_,
                             'attempts' => (string) $job_row_->attempts,
                             'reserved_at' => $job_row_->reserved_at === null ? '-' : (string) $job_row_->reserved_at,
@@ -307,7 +307,7 @@ class hahaha_controller_queue_viewer extends Controller
                     })
                     ->all();
 
-                $snapshot_['queue_pagination'] = $this->pagination_data_resolve_($jobs_paginator_, 'queue_page');
+                $snapshot_['queue_pagination'] = $this->Pagination_Data_Resolve($jobs_paginator_, 'queue_page');
             }
 
             if ($snapshot_['failed_jobs_table_exists']) {
@@ -343,14 +343,14 @@ class hahaha_controller_queue_viewer extends Controller
                             'uuid' => (string) $failed_job_row_->uuid,
                             'connection' => (string) $failed_job_row_->connection,
                             'queue' => (string) $failed_job_row_->queue,
-                            'display_name' => $this->payload_display_name_resolve_($payload_),
+                            'display_name' => $this->Payload_Display_Name_Resolve($payload_),
                             'payload' => $payload_,
                             'failed_at' => (string) $failed_job_row_->failed_at,
                         ];
                     })
                     ->all();
 
-                $snapshot_['fail_queue_pagination'] = $this->pagination_data_resolve_($failed_jobs_paginator_, 'fail_queue_page');
+                $snapshot_['fail_queue_pagination'] = $this->Pagination_Data_Resolve($failed_jobs_paginator_, 'fail_queue_page');
             }
 
             $snapshot_['status_message'] = '已讀取 database queue 狀態。';
@@ -361,7 +361,7 @@ class hahaha_controller_queue_viewer extends Controller
         return $snapshot_;
     }
 
-    private function payload_display_name_resolve_(string $payload_): string
+    public function Payload_Display_Name_Resolve(string $payload_): string
     {
         $decoded_payload_ = json_decode($payload_, true);
         if (! is_array($decoded_payload_)) {
@@ -378,7 +378,7 @@ class hahaha_controller_queue_viewer extends Controller
         return $display_name_ === '' ? '-' : $display_name_;
     }
 
-    private function redis_snapshot_resolve_(hahaha_config_queue_viewer $page_config_, Request $request): array
+    public function Redis_Snapshot_Resolve(hahaha_config_queue_viewer $page_config_, Request $request): array
     {
         $redis_connection_name_ = $page_config_->Selected_Database_;
         $queue_name_ = (string) config('queue.connections.redis.queue', 'default');
@@ -430,7 +430,7 @@ class hahaha_controller_queue_viewer extends Controller
         return $snapshot_;
     }
 
-    private function page_config_from_request_resolve_(Request $request, string $default_tab_ = 'queue'): hahaha_config_queue_viewer
+    public function Page_Config_From_Request_Resolve(Request $request, string $default_tab_ = 'queue'): hahaha_config_queue_viewer
     {
         return hahaha_config_queue_viewer::Instance()
             ->Clear()
@@ -438,11 +438,11 @@ class hahaha_controller_queue_viewer extends Controller
                 (string) $request->input('connection', ''),
                 (string) $request->input('db', ''),
                 (string) $request->input('tab', $default_tab_),
-                $this->request_queue_list_resolve_($request)
+                $this->Request_Queue_List_Resolve($request)
             );
     }
 
-    private function request_queue_list_resolve_(Request $request): array
+    public function Request_Queue_List_Resolve(Request $request): array
     {
         $selected_queue_list_ = $request->array('selected_queue');
 
@@ -456,7 +456,7 @@ class hahaha_controller_queue_viewer extends Controller
     /**
      * @return array{is_supported: bool, message: string, jobs_table_name: string}
      */
-    private function database_queue_action_context_resolve_(hahaha_config_queue_viewer $page_config_): array
+    public function Database_Queue_Action_Context_Resolve(hahaha_config_queue_viewer $page_config_): array
     {
         $jobs_table_name_ = HahahaTable::JOBS->value;
 
@@ -486,7 +486,7 @@ class hahaha_controller_queue_viewer extends Controller
     /**
      * @return array{is_supported: bool, message: string, failed_jobs_table_name: string}
      */
-    private function database_failed_queue_action_context_resolve_(hahaha_config_queue_viewer $page_config_): array
+    public function Database_Failed_Queue_Action_Context_Resolve(hahaha_config_queue_viewer $page_config_): array
     {
         $failed_jobs_table_name_ = HahahaTable::FAILED_JOBS->value;
 
@@ -513,7 +513,7 @@ class hahaha_controller_queue_viewer extends Controller
         ];
     }
 
-    private function queue_redirect_response_resolve_(hahaha_config_queue_viewer $page_config_, array $extra_query_ = []): RedirectResponse
+    public function Queue_Redirect_Response_Resolve(hahaha_config_queue_viewer $page_config_, array $extra_query_ = []): RedirectResponse
     {
         return redirect()->route($page_config_->Route_Name_, array_filter([
             'tab' => $page_config_->Selected_Tab_,
@@ -530,7 +530,7 @@ class hahaha_controller_queue_viewer extends Controller
         }));
     }
 
-    private function pagination_data_resolve_(object $paginator_, string $page_name_): array
+    public function Pagination_Data_Resolve(object $paginator_, string $page_name_): array
     {
         return [
             'current_page' => $paginator_->currentPage(),
